@@ -740,7 +740,12 @@
 
   .cards-equidistant-container {
     grid-template-columns: repeat(2, 1fr);
-    top: 70px;
+    top: 0;
+  }
+
+  .about-slide-container,
+  .contact-slide-container {
+    grid-template-columns: 1fr;
   }
 
   .view-modal-grid {
@@ -756,4 +761,232 @@
   .cards-equidistant-container {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==========================================================================
+   About Section - In-page sliding layout
+   ========================================================================== */
+.about-slide-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: clamp(20px, 3vw, 40px);
+  padding: clamp(20px, 3vw, 40px);
+  box-sizing: border-box;
+  align-items: center;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(195, 107, 126, 0.35) transparent;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.about-panel-left,
+.about-panel-right {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  will-change: transform, opacity;
+  width: 100%;
+}
+
+.about-hero-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1.5px solid rgba(227, 174, 186, 0.45);
+  box-shadow: 0 10px 30px rgba(45, 49, 66, 0.08);
+  padding: clamp(24px, 3vw, 36px);
+}
+
+.about-tag {
+  background: rgba(195, 107, 126, 0.12);
+  color: var(--color-rose);
+  padding: 5px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
+.about-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+  color: var(--color-charcoal);
+  line-height: 1.22;
+  margin-bottom: 12px;
+}
+
+.about-desc {
+  color: #6E7485;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.about-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(227, 174, 186, 0.3);
+}
+
+.about-stat-box {
+  text-align: center;
+  background: #FFF5F6;
+  border-radius: 14px;
+  padding: 12px 8px;
+}
+
+.stat-num {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-rose);
+  display: block;
+}
+
+.stat-lbl {
+  font-size: 0.74rem;
+  color: #6E7485;
+  font-weight: 600;
+}
+
+.about-feature-card {
+  background: #FFFFFF;
+  border-radius: 18px;
+  border: 1.5px solid rgba(227, 174, 186, 0.4);
+  box-shadow: 0 8px 24px rgba(45, 49, 66, 0.06);
+  padding: 18px 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all 0.25s ease;
+}
+
+.about-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(195, 107, 126, 0.18);
+  border-color: rgba(195, 107, 126, 0.6);
+}
+
+.about-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #FFF0F3;
+  color: var(--color-rose);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.about-feature-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  margin-bottom: 3px;
+}
+
+.about-feature-desc {
+  font-size: 0.85rem;
+  color: #6E7485;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   Contact Section - In-page sliding layout
+   ========================================================================== */
+.contact-slide-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: clamp(20px, 3vw, 40px);
+  padding: clamp(20px, 3vw, 40px);
+  box-sizing: border-box;
+  align-items: center;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(195, 107, 126, 0.35) transparent;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.contact-panel-left,
+.contact-panel-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  will-change: transform, opacity;
+  width: 100%;
+}
+
+.contact-form-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1.5px solid rgba(227, 174, 186, 0.45);
+  box-shadow: 0 10px 30px rgba(45, 49, 66, 0.08);
+  padding: clamp(24px, 3vw, 36px);
+}
+
+.contact-info-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1.5px solid rgba(227, 174, 186, 0.45);
+  box-shadow: 0 10px 30px rgba(45, 49, 66, 0.08);
+  padding: clamp(24px, 3vw, 36px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contact-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px;
+  background: #FFF8F9;
+  border-radius: 14px;
+  border: 1px solid rgba(227, 174, 186, 0.3);
+}
+
+.contact-icon-bubble {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #FFFFFF;
+  color: var(--color-rose);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(195, 107, 126, 0.15);
+}
+
+.contact-item-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  margin-bottom: 2px;
+}
+
+.contact-item-desc {
+  font-size: 0.84rem;
+  color: #6E7485;
 }

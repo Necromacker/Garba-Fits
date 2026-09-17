@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Footer from './components/Footer';
 import Home from './pages/Home';
-import About from './pages/About';
-import Contact from './pages/Contact';
 import './styles/style-base.css';
 
 // Scroll to top helper
@@ -20,16 +17,17 @@ function ScrollToTop() {
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
-  const isHomePage = location.pathname === '/' || location.pathname === '/rent';
   
   // Initial activeTab determined by URL
-  const [activeTab, setActiveTab] = useState(
-    typeof window !== 'undefined' && window.location.pathname === '/rent' ? 'rent' : 'home'
-  );
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window === 'undefined') return 'home';
+    const path = window.location.pathname.replace('/', '');
+    return ['rent', 'about', 'contact'].includes(path) ? path : 'home';
+  });
   const [requestedNav, setRequestedNav] = useState(null);
 
   const handleNavClick = (tab) => {
-    if (location.pathname !== '/' && location.pathname !== '/rent') {
+    if (location.pathname !== '/') {
       navigate('/');
     }
     setRequestedNav({ tab, timestamp: Date.now() });
@@ -40,28 +38,6 @@ function AppContent() {
       <Navbar activeTab={activeTab} onNavClick={handleNavClick} />
       <main>
         <Routes>
-          <Route
-            path="/"
-            element={
-              <Home
-                activeTab={activeTab}
-                onActiveTabChange={setActiveTab}
-                requestedNav={requestedNav}
-              />
-            }
-          />
-          <Route
-            path="/rent"
-            element={
-              <Home
-                activeTab={activeTab}
-                onActiveTabChange={setActiveTab}
-                requestedNav={requestedNav}
-              />
-            }
-          />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
           <Route
             path="*"
             element={
@@ -74,7 +50,6 @@ function AppContent() {
           />
         </Routes>
       </main>
-      {!isHomePage && <Footer />}
     </div>
   );
 }

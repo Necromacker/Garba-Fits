@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { BrowseRentIcon, EyeIcon, ArrowRightIcon, StarIcon, CloseIcon } from '../components/Icons';
+import { BrowseRentIcon, EyeIcon, ArrowRightIcon, StarIcon, CloseIcon, SparkleIcon, ShieldCheckIcon } from '../components/Icons';
 import RentalModal from '../components/RentalModal';
 import heroImg from '../assets/1.png';
 import '../styles/style-home.css';
@@ -225,12 +225,25 @@ export default function Home({
   const getRightCards = () => cardRefs.current.filter((_, idx) => (idx % 4) >= 2).filter(Boolean);
   const getAllCards = () => cardRefs.current.filter(Boolean);
 
+  /* ── Refs: About view panels ── */
+  const aboutTrackRef = useRef(null);
+  const aboutLeftRef = useRef(null);
+  const aboutRightRef = useRef(null);
+
+  /* ── Refs: Contact view panels ── */
+  const contactTrackRef = useRef(null);
+  const contactLeftRef = useRef(null);
+  const contactRightRef = useRef(null);
+
+  /* ── Contact form state ── */
+  const [contactSubmitted, setContactSubmitted] = useState(false);
+  const [contactForm, setContactForm] = useState({ name: '', phone: '', email: '', message: '' });
+
   /* ── Animation & queue state machines ── */
   const currentTimelineRef = useRef(null);
   const isAnimatingRef = useRef(false);
   const currentViewRef = useRef(activeTab || 'home');
   const pendingTabRef = useRef(null);
-  const isInitialMountRef = useRef(true);
 
   /* ── Caption carousel ── */
   useEffect(() => {
@@ -244,282 +257,129 @@ export default function Home({
     return () => clearInterval(interval);
   }, []);
 
-  /* ── Slide in Home components like initial entrance from off-screen ── */
-  const playHomeEntrance = (onComplete) => {
-    isAnimatingRef.current = true;
-
-    // Reset initial positions for off-screen entrance
-    gsap.set(circleRef.current, { x: '120vw', opacity: 0 });
-    gsap.set(headlineRef.current, { x: '-120vw', opacity: 0 });
-    gsap.set(imageRef.current, { x: '110vw', opacity: 0 });
-    gsap.set(subtitleRef.current, { x: '-110vw', opacity: 1 });
-    gsap.set(actionsRef.current, { opacity: 0 });
-
-    const tl = gsap.timeline({
-      defaults: { ease: 'power3.out' },
-      onComplete: () => {
-        currentViewRef.current = 'home';
-        isAnimatingRef.current = false;
-        if (onComplete) onComplete();
-
-        // Check if user clicked 'rent' while the home entrance was running
-        if (pendingTabRef.current && pendingTabRef.current !== 'home') {
-          const next = pendingTabRef.current;
-          pendingTabRef.current = null;
-          onActiveTabChange(next);
-          if (next === 'rent') {
-            transitionToRent();
-          }
-        }
-      }
-    });
-    currentTimelineRef.current = tl;
-
-    // PAIR 1: semicircle (right) + headline (left) together
-    tl.fromTo(circleRef.current,
-      { x: '120vw', opacity: 0 },
-      { x: '0%', opacity: 0.92, duration: 0.85 }, 0)
-      .fromTo(headlineRef.current,
-        { x: '-120vw', opacity: 0 },
-        { x: '0%', opacity: 1, duration: 0.85 }, 0)
-
-      // PAIR 2: hero image (right) + subtitle (left) together (no fade on subtitle)
-      .fromTo(imageRef.current,
-        { x: '110vw', opacity: 0 },
-        { x: '0%', opacity: 1, duration: 0.8 }, '+=0.05')
-      .fromTo(subtitleRef.current,
-        { x: '-110vw', opacity: 1 },
-        { x: '0%', opacity: 1, duration: 0.8 }, '<')
-
-      // Button: fade in after that
-      .fromTo(actionsRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.55, ease: 'power2.out' }, '+=0.05');
-
-    return tl;
+  /* ── Universal View Slide-Out Animation ── */
+  const buildSlideOut = (fromView, tl) => {
+    if (fromView === 'home') {
+      tl.to(actionsRef.current, { opacity: 0, duration: 0.25, ease: 'power2.out' }, 0)
+        .to([headlineRef.current, subtitleRef.current], { x: '-140vw', opacity: 0, duration: 0.55, ease: 'power3.in' }, 0.05)
+        .to([circleRef.current, imageRef.current], { x: '140vw', opacity: 0, duration: 0.55, ease: 'power3.in' }, 0.05)
+        .add(() => {
+          gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'none' });
+        });
+    } else if (fromView === 'rent') {
+      const leftCards = getLeftCards();
+      const rightCards = getRightCards();
+      tl.to(leftCards, { x: '-140vw', opacity: 0, duration: 0.5, stagger: 0.04, ease: 'power3.in' }, 0)
+        .to(rightCards, { x: '140vw', opacity: 0, duration: 0.5, stagger: 0.04, ease: 'power3.in' }, '<')
+        .add(() => {
+          gsap.set(cardsTrackRef.current, { visibility: 'hidden', pointerEvents: 'none' });
+        });
+    } else if (fromView === 'about') {
+      tl.to(aboutLeftRef.current, { x: '-140vw', opacity: 0, duration: 0.5, ease: 'power3.in' }, 0)
+        .to(aboutRightRef.current, { x: '140vw', opacity: 0, duration: 0.5, ease: 'power3.in' }, '<')
+        .add(() => {
+          gsap.set(aboutTrackRef.current, { visibility: 'hidden', pointerEvents: 'none' });
+        });
+    } else if (fromView === 'contact') {
+      tl.to(contactLeftRef.current, { x: '-140vw', opacity: 0, duration: 0.5, ease: 'power3.in' }, 0)
+        .to(contactRightRef.current, { x: '140vw', opacity: 0, duration: 0.5, ease: 'power3.in' }, '<')
+        .add(() => {
+          gsap.set(contactTrackRef.current, { visibility: 'hidden', pointerEvents: 'none' });
+        });
+    }
   };
 
-  /* ── Transition from Home to Rent ── */
-  const transitionToRent = () => {
-    isAnimatingRef.current = true;
-
-    const leftCards = getLeftCards();
-    const rightCards = getRightCards();
-    const allCards = getAllCards();
-
-    // Preset cards off-screen before making track visible
-    gsap.set(leftCards, { x: '-140vw', opacity: 0 });
-    gsap.set(rightCards, { x: '140vw', opacity: 0 });
-    gsap.set(cardsTrackRef.current, {
-      visibility: 'visible',
-      pointerEvents: 'auto'
-    });
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        currentViewRef.current = 'rent';
-        isAnimatingRef.current = false;
-
-        // Lock cards in position
-        gsap.set(allCards, {
-          x: '0%',
-          opacity: 1,
-          visibility: 'visible'
-        });
-
-        // Check if user clicked 'home' while the rent transition was running
-        if (pendingTabRef.current && pendingTabRef.current !== 'rent') {
-          const next = pendingTabRef.current;
-          pendingTabRef.current = null;
-          onActiveTabChange(next);
-          if (next === 'home') {
-            transitionToHome();
-          }
-        }
-      }
-    });
-    currentTimelineRef.current = tl;
-
-    // 1. Button fades out first
-    tl.to(actionsRef.current, {
-      opacity: 0,
-      duration: 0.3,
-      ease: 'power2.out'
-    }, 0);
-
-    // 2. Headline & subtitle slide LEFT off-screen
-    tl.to(headlineRef.current, {
-      x: '-140vw',
-      opacity: 0,
-      duration: 0.65,
-      ease: 'power3.in'
-    }, 0.08);
-
-    tl.to(subtitleRef.current, {
-      x: '-140vw',
-      opacity: 0,
-      duration: 0.65,
-      ease: 'power3.in'
-    }, 0.12);
-
-    // 3. SVG & semicircle bg slide RIGHT off-screen
-    tl.to(imageRef.current, {
-      x: '140vw',
-      opacity: 0,
-      duration: 0.65,
-      ease: 'power3.in'
-    }, 0.08);
-
-    tl.to(circleRef.current, {
-      x: '140vw',
-      opacity: 0,
-      duration: 0.7,
-      ease: 'power3.in'
-    }, 0.12);
-
-    // 4. Disable intro pointer events
-    tl.add(() => {
-      gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'none' });
-    }, '+=0.02');
-
-    // 5. From the same off-screen sides:
-    // Left cards slide in from LEFT off-screen
-    tl.to(leftCards,
-      {
-        x: '0%',
-        opacity: 1,
-        duration: 0.75,
-        stagger: 0.08,
-        ease: 'power3.out'
-      },
-      '+=0.04'
-    );
-
-    // Right cards slide in from RIGHT off-screen
-    tl.to(rightCards,
-      {
-        x: '0%',
-        opacity: 1,
-        duration: 0.75,
-        stagger: 0.08,
-        ease: 'power3.out'
-      },
-      '<' // concurrent with left cards
-    );
-  };
-
-  /* ── Transition from Rent back to Home ── */
-  const transitionToHome = () => {
-    isAnimatingRef.current = true;
-
-    const leftCards = getLeftCards();
-    const rightCards = getRightCards();
-
-    const tl = gsap.timeline({
-      onComplete: () => {
-        currentViewRef.current = 'home';
-        isAnimatingRef.current = false;
-        gsap.set(cardsTrackRef.current, {
-          visibility: 'hidden',
-          pointerEvents: 'none'
-        });
-        gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'auto' });
-
-        // Check if user clicked 'rent' while the home transition was running
-        if (pendingTabRef.current && pendingTabRef.current !== 'home') {
-          const next = pendingTabRef.current;
-          pendingTabRef.current = null;
-          onActiveTabChange(next);
-          if (next === 'rent') {
-            transitionToRent();
-          }
-        }
-      }
-    });
-    currentTimelineRef.current = tl;
-
-    // 1. Slide left cards back to left off-screen, right cards back to right off-screen
-    tl.to(leftCards, {
-      x: '-140vw',
-      opacity: 0,
-      duration: 0.55,
-      stagger: 0.06,
-      ease: 'power3.in'
-    }, 0);
-
-    tl.to(rightCards, {
-      x: '140vw',
-      opacity: 0,
-      duration: 0.55,
-      stagger: 0.06,
-      ease: 'power3.in'
-    }, '<');
-
-    // 2. Hide cards container and restore pointer events
-    tl.add(() => {
-      gsap.set(cardsTrackRef.current, {
-        visibility: 'hidden',
-        pointerEvents: 'none'
-      });
-      gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'auto' });
-
-      // Reset home components off-screen ready to slide in
-      gsap.set(circleRef.current, { x: '120vw', opacity: 0 });
-      gsap.set(headlineRef.current, { x: '-120vw', opacity: 0 });
-      gsap.set(imageRef.current, { x: '110vw', opacity: 0 });
-      gsap.set(subtitleRef.current, { x: '-110vw', opacity: 1 });
+  /* ── Universal View Slide-In Preparation ── */
+  const prepareSlideIn = (toView) => {
+    if (toView === 'home') {
+      gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'auto', opacity: 1 });
+      gsap.set([headlineRef.current, subtitleRef.current], { x: '-140vw', opacity: 0 });
+      gsap.set([circleRef.current, imageRef.current], { x: '140vw', opacity: 0 });
       gsap.set(actionsRef.current, { opacity: 0 });
-    });
-
-    // 3. Bring home page components in from off-screen (exact same pairs as initial load)
-    // PAIR 1: semicircle (right) + headline (left) together
-    tl.fromTo(circleRef.current,
-      { x: '120vw', opacity: 0 },
-      { x: '0%', opacity: 0.92, duration: 0.85, ease: 'power3.out' }, '+=0.04')
-      .fromTo(headlineRef.current,
-        { x: '-120vw', opacity: 0 },
-        { x: '0%', opacity: 1, duration: 0.85, ease: 'power3.out' }, '<')
-
-      // PAIR 2: hero image (right) + subtitle (left) together (no fade on subtitle)
-      .fromTo(imageRef.current,
-        { x: '110vw', opacity: 0 },
-        { x: '0%', opacity: 1, duration: 0.8, ease: 'power3.out' }, '+=0.05')
-      .fromTo(subtitleRef.current,
-        { x: '-110vw', opacity: 1 },
-        { x: '0%', opacity: 1, duration: 0.8, ease: 'power3.out' }, '<')
-
-      // Button: fade in
-      .fromTo(actionsRef.current,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.55, ease: 'power2.out' }, '+=0.05');
+    } else if (toView === 'rent') {
+      const leftCards = getLeftCards();
+      const rightCards = getRightCards();
+      gsap.set(cardsTrackRef.current, { visibility: 'visible', pointerEvents: 'auto' });
+      gsap.set(leftCards, { x: '-140vw', opacity: 0 });
+      gsap.set(rightCards, { x: '140vw', opacity: 0 });
+    } else if (toView === 'about') {
+      gsap.set(aboutTrackRef.current, { visibility: 'visible', pointerEvents: 'auto' });
+      gsap.set(aboutLeftRef.current, { x: '-140vw', opacity: 0 });
+      gsap.set(aboutRightRef.current, { x: '140vw', opacity: 0 });
+    } else if (toView === 'contact') {
+      gsap.set(contactTrackRef.current, { visibility: 'visible', pointerEvents: 'auto' });
+      gsap.set(contactLeftRef.current, { x: '-140vw', opacity: 0 });
+      gsap.set(contactRightRef.current, { x: '140vw', opacity: 0 });
+    }
   };
 
-  /* ── Unified Transition Request Handler with Smart Queue ── */
+  /* ── Universal View Slide-In Tweens Attachment ── */
+  const attachSlideIn = (toView, tl) => {
+    if (toView === 'home') {
+      tl.to([headlineRef.current, subtitleRef.current], { x: '0%', opacity: 1, duration: 0.7, ease: 'power3.out' }, '+=0.02')
+        .to([circleRef.current, imageRef.current], { x: '0%', opacity: 1, duration: 0.7, ease: 'power3.out' }, '<')
+        .to(actionsRef.current, { opacity: 1, duration: 0.45, ease: 'power2.out' }, '-=0.3');
+    } else if (toView === 'rent') {
+      const leftCards = getLeftCards();
+      const rightCards = getRightCards();
+      tl.to(leftCards, { x: '0%', opacity: 1, duration: 0.65, stagger: 0.06, ease: 'power3.out' }, '+=0.02')
+        .to(rightCards, { x: '0%', opacity: 1, duration: 0.65, stagger: 0.06, ease: 'power3.out' }, '<');
+    } else if (toView === 'about') {
+      tl.to(aboutLeftRef.current, { x: '0%', opacity: 1, duration: 0.65, ease: 'power3.out' }, '+=0.02')
+        .to(aboutRightRef.current, { x: '0%', opacity: 1, duration: 0.65, ease: 'power3.out' }, '<');
+    } else if (toView === 'contact') {
+      tl.to(contactLeftRef.current, { x: '0%', opacity: 1, duration: 0.65, ease: 'power3.out' }, '+=0.02')
+        .to(contactRightRef.current, { x: '0%', opacity: 1, duration: 0.65, ease: 'power3.out' }, '<');
+    }
+  };
+
+  /* ── Unified Transition Request Handler with Queue ── */
   const requestTransition = (targetTab) => {
-    // If already in target view and no animation is running, do nothing
     if (targetTab === currentViewRef.current && !isAnimatingRef.current) {
       return;
     }
 
-    // If an animation is currently playing, queue the request and let current animation finish first
     if (isAnimatingRef.current) {
       pendingTabRef.current = targetTab;
-      // Slightly accelerate current animation so user feels immediate responsiveness
       if (currentTimelineRef.current) {
-        currentTimelineRef.current.timeScale(1.35);
+        currentTimelineRef.current.timeScale(1.5);
       }
       return;
     }
 
-    // Not animating: switch navbar highlight now and trigger animation
+    const fromView = currentViewRef.current;
+    isAnimatingRef.current = true;
     pendingTabRef.current = null;
     onActiveTabChange(targetTab);
 
-    if (targetTab === 'rent') {
-      transitionToRent();
-    } else if (targetTab === 'home') {
-      transitionToHome();
-    }
+    prepareSlideIn(targetTab);
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        currentViewRef.current = targetTab;
+        isAnimatingRef.current = false;
+
+        if (targetTab === 'home') {
+          gsap.set([headlineRef.current, subtitleRef.current, circleRef.current, imageRef.current, actionsRef.current], { x: '0%', opacity: 1, clearProps: 'transform' });
+        } else if (targetTab === 'rent') {
+          gsap.set(getAllCards(), { x: '0%', opacity: 1, visibility: 'visible', clearProps: 'transform' });
+        } else if (targetTab === 'about') {
+          gsap.set([aboutLeftRef.current, aboutRightRef.current], { x: '0%', opacity: 1, clearProps: 'transform' });
+        } else if (targetTab === 'contact') {
+          gsap.set([contactLeftRef.current, contactRightRef.current], { x: '0%', opacity: 1, clearProps: 'transform' });
+        }
+
+        if (pendingTabRef.current && pendingTabRef.current !== targetTab) {
+          const next = pendingTabRef.current;
+          pendingTabRef.current = null;
+          requestTransition(next);
+        }
+      }
+    });
+
+    currentTimelineRef.current = tl;
+    buildSlideOut(fromView, tl);
+    attachSlideIn(targetTab, tl);
   };
 
   /* ── React to navbar click events passed via requestedNav ── */
@@ -534,29 +394,39 @@ export default function Home({
     const rightCards = getRightCards();
     const allCards = getAllCards();
 
+    // Reset non-active views off-screen
+    gsap.set(leftCards, { x: '-140vw', opacity: 0 });
+    gsap.set(rightCards, { x: '140vw', opacity: 0 });
+    gsap.set(cardsTrackRef.current, { visibility: 'hidden', pointerEvents: 'none' });
+
+    gsap.set(aboutLeftRef.current, { x: '-140vw', opacity: 0 });
+    gsap.set(aboutRightRef.current, { x: '140vw', opacity: 0 });
+    gsap.set(aboutTrackRef.current, { visibility: 'hidden', pointerEvents: 'none' });
+
+    gsap.set(contactLeftRef.current, { x: '-140vw', opacity: 0 });
+    gsap.set(contactRightRef.current, { x: '140vw', opacity: 0 });
+    gsap.set(contactTrackRef.current, { visibility: 'hidden', pointerEvents: 'none' });
+
     if (activeTab === 'rent') {
       currentViewRef.current = 'rent';
       gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'none', opacity: 0 });
-      gsap.set(cardsTrackRef.current, {
-        visibility: 'visible',
-        pointerEvents: 'auto'
-      });
-      gsap.set(allCards, {
-        x: '0%',
-        opacity: 1
-      });
+      gsap.set(cardsTrackRef.current, { visibility: 'visible', pointerEvents: 'auto' });
+      gsap.set(allCards, { x: '0%', opacity: 1 });
+    } else if (activeTab === 'about') {
+      currentViewRef.current = 'about';
+      gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'none', opacity: 0 });
+      gsap.set(aboutTrackRef.current, { visibility: 'visible', pointerEvents: 'auto' });
+      gsap.set([aboutLeftRef.current, aboutRightRef.current], { x: '0%', opacity: 1 });
+    } else if (activeTab === 'contact') {
+      currentViewRef.current = 'contact';
+      gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'none', opacity: 0 });
+      gsap.set(contactTrackRef.current, { visibility: 'visible', pointerEvents: 'auto' });
+      gsap.set([contactLeftRef.current, contactRightRef.current], { x: '0%', opacity: 1 });
     } else {
       currentViewRef.current = 'home';
-      gsap.set(leftCards, { x: '-140vw', opacity: 0 });
-      gsap.set(rightCards, { x: '140vw', opacity: 0 });
-      gsap.set(cardsTrackRef.current, {
-        visibility: 'hidden',
-        pointerEvents: 'none'
-      });
-      playHomeEntrance();
+      gsap.set([introBoxRef.current, graphicBoxRef.current], { pointerEvents: 'auto', opacity: 1 });
+      gsap.set([headlineRef.current, subtitleRef.current, circleRef.current, imageRef.current, actionsRef.current], { x: '0%', opacity: 1 });
     }
-
-    isInitialMountRef.current = false;
 
     return () => {
       if (currentTimelineRef.current) currentTimelineRef.current.kill();
@@ -572,7 +442,7 @@ export default function Home({
             {/* ════════════ LEFT COLUMN: Intro text ════════════ */}
             <div className="hero-content">
               <div className="hero-intro-wrapper" ref={introBoxRef}>
-                <h1 className="hero-headline" ref={headlineRef} style={{ opacity: 0 }}>
+                <h1 className="hero-headline" ref={headlineRef}>
                   <span className="headline-word text-rose">Wear</span>{' '}
                   <span className="headline-word text-charcoal">it,</span>{' '}
                   <span className="hero-pill-frame">
@@ -590,7 +460,7 @@ export default function Home({
                 </p>
 
                 {/* Primary "Rent Now" button */}
-                <div className="hero-actions" ref={actionsRef} style={{ opacity: 0 }}>
+                <div className="hero-actions" ref={actionsRef}>
                   <button
                     className="btn-primary"
                     id="hero-action-btn"
@@ -606,8 +476,8 @@ export default function Home({
             {/* ════════════ RIGHT COLUMN: Semicircle/SVG ════════════ */}
             <div className="hero-visual">
               <div className="hero-visual-wrapper" ref={graphicBoxRef}>
-                <div className="hero-circle-backdrop" ref={circleRef} style={{ opacity: 0 }} />
-                <div className="hero-image-wrapper" ref={imageRef} style={{ opacity: 0 }}>
+                <div className="hero-circle-backdrop" ref={circleRef} />
+                <div className="hero-image-wrapper" ref={imageRef}>
                   <img src={heroImg} alt="GarbaFits Illustration Preview" />
                 </div>
               </div>
@@ -616,7 +486,7 @@ export default function Home({
           </div>
         </div>
 
-        {/* ════════════ OUTFIT CARDS: Equidistant track across full width ════════════ */}
+        {/* ════════════ OUTFIT CARDS (RENT VIEW): Equidistant track ════════════ */}
         <div className="cards-equidistant-container" ref={cardsTrackRef}>
           {OUTFITS.map((outfit, index) => (
             <OutfitCardItem
@@ -627,6 +497,199 @@ export default function Home({
               onView={(item) => setViewModalOutfit(item)}
             />
           ))}
+        </div>
+
+        {/* ════════════ ABOUT VIEW: In-page slide panels ════════════ */}
+        <div className="about-slide-container" ref={aboutTrackRef}>
+          {/* Left panel */}
+          <div className="about-panel-left" ref={aboutLeftRef}>
+            <div className="about-hero-card">
+              <span className="about-tag">Campus Traditional Wear</span>
+              <h2 className="about-title">Why buy once when you can slay every night?</h2>
+              <p className="about-desc">
+                GarbaFits connects college students with authentic, high-quality Gamthi and Kutchi Chaniya Cholis without the ₹15,000+ price tag. Wear designer fits, turn heads with 9-meter full twirls, and pass the sparkle forward.
+              </p>
+              <div className="about-stats-grid">
+                <div className="about-stat-box">
+                  <span className="stat-num">100%</span>
+                  <span className="stat-lbl">Steam Sanitized</span>
+                </div>
+                <div className="about-stat-box">
+                  <span className="stat-num">9M+</span>
+                  <span className="stat-lbl">Ultra Flare Twirl</span>
+                </div>
+                <div className="about-stat-box">
+                  <span className="stat-num">₹700</span>
+                  <span className="stat-lbl">Starting / Night</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right panel */}
+          <div className="about-panel-right" ref={aboutRightRef}>
+            <div className="about-feature-card">
+              <div className="about-icon-wrap">
+                <SparkleIcon size={22} />
+              </div>
+              <div>
+                <h4 className="about-feature-title">Authentic Gamthi & Kutchi Craft</h4>
+                <p className="about-feature-desc">Real mirrorwork, vibrant cowrie shell hangings, and handcrafted embroidery that shines under garba lights.</p>
+              </div>
+            </div>
+
+            <div className="about-feature-card">
+              <div className="about-icon-wrap">
+                <ShieldCheckIcon size={22} />
+              </div>
+              <div>
+                <h4 className="about-feature-title">Pristine Hygiene & Quality</h4>
+                <p className="about-feature-desc">Every outfit is professionally dry-cleaned, steam-sanitized, and inspected before each festive hand-off.</p>
+              </div>
+            </div>
+
+            <div className="about-feature-card">
+              <div className="about-icon-wrap">
+                <BrowseRentIcon size={22} />
+              </div>
+              <div>
+                <h4 className="about-feature-title">Seamless Campus Pickup & Returns</h4>
+                <p className="about-feature-desc">Reserve in 2 minutes, pick up near your campus hub, and return post-Navratri with zero hassle.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ════════════ CONTACT VIEW: In-page slide panels ════════════ */}
+        <div className="contact-slide-container" ref={contactTrackRef}>
+          {/* Left panel: Form */}
+          <div className="contact-panel-left" ref={contactLeftRef}>
+            <div className="contact-form-card">
+              <span className="about-tag">Get in Touch</span>
+              <h2 className="about-title" style={{ fontSize: '1.75rem', marginBottom: '8px' }}>Fitting or Booking Query?</h2>
+              <p className="about-desc" style={{ marginBottom: '18px', fontSize: '0.9rem' }}>
+                Drop us a message for size trials, group discounts, or custom Navratri dates.
+              </p>
+
+              {contactSubmitted ? (
+                <div style={{ textAlign: 'center', padding: '24px 16px', background: '#F0FFF4', borderRadius: '16px', border: '1px solid #C6F6D5' }}>
+                  <div style={{ fontSize: '1.6rem', color: '#38A169', marginBottom: '8px' }}>✓</div>
+                  <h3 style={{ fontSize: '1.2rem', color: 'var(--color-charcoal)', marginBottom: '6px' }}>Query Received!</h3>
+                  <p style={{ color: '#4A5568', fontSize: '0.88rem', marginBottom: '16px' }}>A coordinator will contact you shortly via WhatsApp.</p>
+                  <button
+                    type="button"
+                    onClick={() => setContactSubmitted(false)}
+                    style={{ background: 'var(--color-rose)', color: '#FFFFFF', border: 'none', padding: '8px 20px', borderRadius: '9999px', fontSize: '0.86rem', fontWeight: '600', cursor: 'pointer' }}
+                  >
+                    Send Another
+                  </button>
+                </div>
+              ) : (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    setContactSubmitted(true);
+                  }}
+                  style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}
+                >
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: 'var(--color-charcoal)', marginBottom: '5px' }}>Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Diya Patel"
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid rgba(227, 174, 186, 0.4)', fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: 'var(--color-charcoal)', marginBottom: '5px' }}>WhatsApp / Phone</label>
+                      <input
+                        type="tel"
+                        required
+                        placeholder="+91 98765 43210"
+                        value={contactForm.phone}
+                        onChange={(e) => setContactForm({ ...contactForm, phone: e.target.value })}
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid rgba(227, 174, 186, 0.4)', fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit' }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: 'var(--color-charcoal)', marginBottom: '5px' }}>Email</label>
+                      <input
+                        type="email"
+                        placeholder="name@college.edu"
+                        value={contactForm.email}
+                        onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid rgba(227, 174, 186, 0.4)', fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: '600', color: 'var(--color-charcoal)', marginBottom: '5px' }}>Message / Outfit Query</label>
+                    <textarea
+                      required
+                      rows={3}
+                      placeholder="Let us know which outfit, size, or dates you need..."
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1.5px solid rgba(227, 174, 186, 0.4)', fontSize: '0.9rem', outline: 'none', fontFamily: 'inherit', resize: 'vertical' }}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    style={{ background: 'var(--color-charcoal)', color: '#FFFFFF', padding: '12px 24px', borderRadius: '9999px', border: 'none', fontSize: '0.94rem', fontWeight: '600', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '4px', transition: 'all 0.25s ease' }}
+                  >
+                    <span>Send Message</span>
+                    <ArrowRightIcon size={16} />
+                  </button>
+                </form>
+              )}
+            </div>
+          </div>
+
+          {/* Right panel: Concierge & Fast Help */}
+          <div className="contact-panel-right" ref={contactRightRef}>
+            <div className="contact-info-card">
+              <h3 style={{ fontSize: '1.3rem', color: 'var(--color-charcoal)', fontFamily: 'var(--font-serif)', marginBottom: '4px' }}>
+                Instant Concierge & Trials
+              </h3>
+
+              <div className="contact-info-item">
+                <div className="contact-icon-bubble">
+                  <BrowseRentIcon size={20} />
+                </div>
+                <div>
+                  <div className="contact-item-title">On-Campus Trial Slots</div>
+                  <div className="contact-item-desc">Try on Chaniyas with our campus style ambassadors before finalizing your booking.</div>
+                </div>
+              </div>
+
+              <div className="contact-info-item">
+                <div className="contact-icon-bubble">
+                  <SparkleIcon size={20} />
+                </div>
+                <div>
+                  <div className="contact-item-title">Fast WhatsApp Support</div>
+                  <div className="contact-item-desc">+91 98765 43210 (10 AM to 11 PM daily during festive season)</div>
+                </div>
+              </div>
+
+              <div className="contact-info-item">
+                <div className="contact-icon-bubble">
+                  <ShieldCheckIcon size={20} />
+                </div>
+                <div>
+                  <div className="contact-item-title">Instant Deposit Refund</div>
+                  <div className="contact-item-desc">Deposits are credited back via UPI within 2 hours of outfit return.</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

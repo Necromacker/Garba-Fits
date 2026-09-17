@@ -56,11 +56,25 @@ export default function Navbar({ activeTab = 'home', onNavClick = () => {} }) {
     onNavClick('rent');
   };
 
-  const isHomeActive = location.pathname === '/' && activeTab === 'home';
-  const isRentActive = location.pathname === '/' && activeTab === 'rent';
+  const handleAboutClick = (e) => {
+    e.preventDefault();
+    closeMenu();
+    onNavClick('about');
+  };
+
+  const handleContactClick = (e) => {
+    e.preventDefault();
+    closeMenu();
+    onNavClick('contact');
+  };
+
+  const isHomeActive = activeTab === 'home';
+  const isRentActive = activeTab === 'rent';
+  const isAboutActive = activeTab === 'about';
+  const isContactActive = activeTab === 'contact';
 
   return (
-    <div className="floating-navbar-wrapper" ref={wrapperRef} style={{ opacity: 0 }}>
+    <div className="floating-navbar-wrapper" ref={wrapperRef}>
       <header className="site-header floating-navbar">
         <nav className="navbar">
           {/* Logo Brand */}
@@ -69,7 +83,6 @@ export default function Navbar({ activeTab = 'home', onNavClick = () => {} }) {
             className="navbar-brand"
             onClick={handleHomeClick}
             ref={brandRef}
-            style={{ opacity: 0 }}
           >
             <span className="brand-script-text">
               GarbaFits
@@ -100,22 +113,22 @@ export default function Navbar({ activeTab = 'home', onNavClick = () => {} }) {
               </button>
             </li>
             <li>
-              <Link
-                to="/about"
-                className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`}
-                onClick={closeMenu}
+              <button
+                type="button"
+                className={`nav-link ${isAboutActive ? 'active' : ''}`}
+                onClick={handleAboutClick}
               >
                 About
-              </Link>
+              </button>
             </li>
             <li>
-              <Link
-                to="/contact"
-                className={`nav-link ${location.pathname === '/contact' ? 'active' : ''}`}
-                onClick={closeMenu}
+              <button
+                type="button"
+                className={`nav-link ${isContactActive ? 'active' : ''}`}
+                onClick={handleContactClick}
               >
                 Contact
-              </Link>
+              </button>
             </li>
           </ul>
 
