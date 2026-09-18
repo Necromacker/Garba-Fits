@@ -1039,130 +1039,49 @@ export default function Home({
       {/* ── Quick View Modal ── */}
       {viewModalOutfit && (
         <div className="view-modal-overlay" onClick={() => setViewModalOutfit(null)}>
-          <div className="view-modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className="view-modal-card view-modal-top-images-layout" onClick={(e) => e.stopPropagation()}>
             <button className="view-modal-close" onClick={() => setViewModalOutfit(null)} aria-label="Close modal">
               <CloseIcon size={20} />
             </button>
 
-            <div className="view-modal-grid">
-              <div className="view-modal-media">
-                <div
-                  className="modal-slider-track"
-                  ref={modalSliderTrackRef}
-                  style={{ width: `${(viewModalOutfit.images?.length || 1) * 100}%` }}
-                >
-                  {(viewModalOutfit.images || [viewModalOutfit.image]).map((imgSrc, idx) => (
-                    <div
-                      key={idx}
-                      className="modal-slider-slide"
-                      style={{ width: `${100 / (viewModalOutfit.images?.length || 1)}%` }}
-                    >
-                      <img
-                        src={imgSrc}
-                        alt={`${viewModalOutfit.name} - view ${idx + 1}`}
-                        onError={(e) => { e.currentTarget.src = viewModalOutfit.image || '/assets/outfits/p1a.png'; }}
-                      />
-                    </div>
-                  ))}
+            {/* Top: Both preview images side by side in separate divs */}
+            <div className="preview-modal-images-top">
+              {(viewModalOutfit.images && viewModalOutfit.images.length > 0 ? viewModalOutfit.images : [viewModalOutfit.image]).map((imgSrc, idx) => (
+                <div key={idx} className="preview-modal-single-img-card">
+                  <img
+                    src={imgSrc}
+                    alt={`${viewModalOutfit.name} view ${idx + 1}`}
+                    onError={(e) => { e.currentTarget.src = viewModalOutfit.image || '/assets/outfits/p1a.png'; }}
+                  />
                 </div>
-                <span className="view-modal-day">Navratri Day {viewModalOutfit.navratriDay}</span>
-                <span className="view-modal-flair">{viewModalOutfit.flair}</span>
+              ))}
+            </div>
 
-                {viewModalOutfit.images && viewModalOutfit.images.length > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      className="modal-arrow-btn modal-arrow-prev"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setModalImgIndex((prev) => (prev === 0 ? viewModalOutfit.images.length - 1 : prev - 1));
-                      }}
-                      aria-label="Previous preview"
-                      title="Previous preview"
-                    >
-                      <ChevronLeftIcon size={18} />
-                    </button>
-                    <button
-                      type="button"
-                      className="modal-arrow-btn modal-arrow-next"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setModalImgIndex((prev) => (prev === viewModalOutfit.images.length - 1 ? 0 : prev + 1));
-                      }}
-                      aria-label="Next preview"
-                      title="Next preview"
-                    >
-                      <ChevronRightIcon size={18} />
-                    </button>
-                    <div className="modal-dots-container">
-                      {viewModalOutfit.images.map((_, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          className={`modal-dot ${idx === modalImgIndex ? 'active' : ''}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setModalImgIndex(idx);
-                          }}
-                          aria-label={`View image ${idx + 1}`}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
+            {/* Bottom: Contact Us and Rent It buttons */}
+            <div className="preview-modal-actions-row">
+              <button
+                type="button"
+                className="btn-secondary preview-btn-contact"
+                onClick={() => {
+                  setViewModalOutfit(null);
+                  requestTransition('contact');
+                }}
+              >
+                <span>Contact Us</span>
+              </button>
 
-              <div className="view-modal-info">
-                <div className="view-modal-rating">
-                  <StarIcon size={16} />
-                  <span>{viewModalOutfit.rating}</span>
-                  <span className="view-modal-reviews">({viewModalOutfit.reviewsCount} reviews)</span>
-                </div>
-
-                <h2 className="view-modal-title">{viewModalOutfit.name}</h2>
-                <div className="view-modal-theme">{viewModalOutfit.colorTheme}</div>
-                <p className="view-modal-desc">{viewModalOutfit.desc}</p>
-
-                <div className="view-modal-specs">
-                  <div className="spec-item">
-                    <span className="spec-label">Fabric & Craft</span>
-                    <span className="spec-value">{viewModalOutfit.fabric}</span>
-                  </div>
-                  <div className="spec-item">
-                    <span className="spec-label">Available Sizes</span>
-                    <div className="spec-sizes">
-                      {viewModalOutfit.sizes.map(s => <span key={s} className="size-chip active">{s}</span>)}
-                    </div>
-                  </div>
-                  <div className="spec-item">
-                    <span className="spec-label">Retail Worth</span>
-                    <span className="spec-value">₹{viewModalOutfit.retailValue.toLocaleString()}</span>
-                  </div>
-                </div>
-
-                <div className="view-modal-footer">
-                  <div className="view-modal-price">
-                    <span className="modal-price-label">3-Day Rental</span>
-                    <div className="modal-price-val">
-                      ₹{viewModalOutfit.rentPrice.toLocaleString()}
-                      <span className="modal-dep">+ ₹{viewModalOutfit.deposit} deposit</span>
-                    </div>
-                  </div>
-
-                  <button
-                    className="btn-primary"
-                    style={{ padding: '12px 28px' }}
-                    onClick={() => {
-                      const target = viewModalOutfit;
-                      setViewModalOutfit(null);
-                      setSelectedOutfit(target);
-                    }}
-                  >
-                    <span>Proceed to Rent</span>
-                    <ArrowRightIcon size={16} />
-                  </button>
-                </div>
-              </div>
+              <button
+                type="button"
+                className="btn-primary preview-btn-rent"
+                onClick={() => {
+                  const target = viewModalOutfit;
+                  setViewModalOutfit(null);
+                  setSelectedOutfit(target);
+                }}
+              >
+                <span>Rent It</span>
+                <ArrowRightIcon size={16} />
+              </button>
             </div>
           </div>
         </div>
