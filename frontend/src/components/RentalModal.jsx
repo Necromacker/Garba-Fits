@@ -1,286 +1,802 @@
-import React, { useState } from 'react';
-import { CloseIcon, CheckIcon, ShieldCheckIcon, SparkleIcon, ChevronLeftIcon, ChevronRightIcon } from './Icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
+import {
+  CloseIcon,
+  CheckIcon,
+  ShieldCheckIcon,
+  SparkleIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  BanknoteIcon,
+  CreditCardIcon,
+  FittingIcon,
+  ArrowRightIcon
+} from './Icons';
 
-export default function RentalModal({ outfit, onClose, onBookingSuccess }) {
-  const [modalImgIdx, setModalImgIdx] = useState(0);
+export default function RentalModal({ outfit, onClose, onNavigateTab }) {
+  // Step state: 1 = Date, 2 = Payment Method, 3 = User Details, 4 = Confirmation Screen
+  const [step, setStep] = useState(1);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  // Multiple Date Selection state (array of 'YYYY-MM-DD' strings)
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState(''); // 'cod' | 'prepaid' | 'trial'
+
   const [formData, setFormData] = useState({
-    customerName: '',
+    firstName: '',
+    lastName: '',
+    mobile: '',
+    otp: '',
     email: '',
-    phone: '',
-    city: 'Ahmedabad',
-    startDate: '',
-    days: '3',
-    size: outfit?.sizes?.[0] || 'M'
+    location: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [successBooking, setSuccessBooking] = useState(null);
-  const [errorMsg, setErrorMsg] = useState('');
 
-  if (!outfit) return null;
+  // OTP Verification state
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpError, setOtpError] = useState('');
 
-  const rentalDays = parseInt(formData.days, 10) || 3;
-  const rentMultiplier = rentalDays === 3 ? 1 : rentalDays * 0.32;
-  const estimatedRent = Math.round(outfit.rentPrice * (rentalDays > 3 ? rentMultiplier : 1));
+  // Razorpay Gateway simulation state
+  const [isRazorpayOpen, setIsRazorpayOpen] = useState(false);
+  const [razorpayProcessing, setRazorpayProcessing] = useState(false);
+  const [razorpayMethod, setRazorpayMethod] = useState('upi');
+  const [razorpaySuccess, setRazorpaySuccess] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg('');
+  // Calendar view state (Current month & year)
+  const today = new Date();
+  const [currentMonthDate, setCurrentMonthDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
 
-    try {
-      const res = await fetch('http://localhost:5001/api/rentals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          outfitId: outfit.id,
-          ...formData
-        })
-      });
+  // Refs for GSAP transitions
+  const stepContainerRef = useRef(null);
+  const modalBoxRef = useRef(null);
 
-      if (res.ok) {
-        const data = await res.json();
-        setSuccessBooking(data.data);
-      } else {
-        // Fallback simulation for client mode
-        setSuccessBooking({
-          id: `GB-${Date.now().toString().slice(-6)}`,
-          outfitName: outfit.name,
-          ...formData,
-          totalRent: estimatedRent,
-          refundableDeposit: outfit.deposit
-        });
+  // Price calculations
+  const pricePerNight = outfit?.pricePerNight || 700;
+  const numNights = selectedDates.length;
+  const totalAmount = numNights > 0 ? numNights * pricePerNight : pricePerNight;
+
+  // Entrance animation for modal card
+  useEffect(() => {
+    if (modalBoxRef.current) {
+      gsap.fromTo(
+        modalBoxRef.current,
+        { scale: 0.92, opacity: 0, y: 20 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }
+      );
+    }
+  }, []);
+
+  // GSAP slide transition between steps in the same div
+  const goToStep = (targetStep, dir = 'next') => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+
+    const el = stepContainerRef.current;
+    if (!el) {
+      setStep(targetStep);
+      setIsAnimating(false);
+      return;
+    }
+
+    const outX = dir === 'next' ? -60 : 60;
+    const inX = dir === 'next' ? 60 : -60;
+
+    gsap.to(el, {
+      x: outX,
+      opacity: 0,
+      duration: 0.22,
+      ease: 'power2.in',
+      onComplete: () => {
+        setStep(targetStep);
+        gsap.fromTo(
+          el,
+          { x: inX, opacity: 0 },
+          {
+            x: 0,
+            opacity: 1,
+            duration: 0.3,
+            ease: 'power2.out',
+            onComplete: () => setIsAnimating(false)
+          }
+        );
       }
-    } catch (err) {
-      // If backend is offline, simulate success for seamless user experience
-      setSuccessBooking({
-        id: `GB-${Date.now().toString().slice(-6)}`,
-        outfitName: outfit.name,
-        ...formData,
-        totalRent: estimatedRent,
-        refundableDeposit: outfit.deposit
-      });
-    } finally {
-      setLoading(false);
+    });
+  };
+
+  // Calendar calculation
+  const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
+  const getFirstDayOfMonth = (year, month) => new Date(year, month, 1).getDay();
+
+  const cYear = currentMonthDate.getFullYear();
+  const cMonth = currentMonthDate.getMonth();
+  const totalDays = getDaysInMonth(cYear, cMonth);
+  const startDay = getFirstDayOfMonth(cYear, cMonth);
+
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const handlePrevMonth = () => {
+    setCurrentMonthDate(new Date(cYear, cMonth - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonthDate(new Date(cYear, cMonth + 1, 1));
+  };
+
+  const isDateSelected = (dayNum) => {
+    const formatted = `${cYear}-${String(cMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+    return selectedDates.includes(formatted);
+  };
+
+  const isDateInPast = (dayNum) => {
+    const d = new Date(cYear, cMonth, dayNum);
+    const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return d < startOfToday;
+  };
+
+  // Toggle multi-date selection
+  const handleDateClick = (dayNum) => {
+    if (isDateInPast(dayNum)) return;
+    const formatted = `${cYear}-${String(cMonth + 1).padStart(2, '0')}-${String(dayNum).padStart(2, '0')}`;
+
+    setSelectedDates((prev) => {
+      if (prev.includes(formatted)) {
+        return prev.filter((d) => d !== formatted);
+      } else {
+        const updated = [...prev, formatted];
+        return updated.sort();
+      }
+    });
+  };
+
+  const formatDisplayDates = (dates) => {
+    if (!dates || dates.length === 0) return '';
+    return dates
+      .map((dStr) => {
+        const [y, m, d] = dStr.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      })
+      .join(', ');
+  };
+
+  // OTP handlers
+  const handleSendOtp = (e) => {
+    e.preventDefault();
+    if (!formData.mobile || formData.mobile.replace(/\D/g, '').length < 10) {
+      setOtpError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    setOtpError('');
+    setOtpSent(true);
+  };
+
+  const handleVerifyOtp = (e) => {
+    e.preventDefault();
+    if (formData.otp.trim() === '1234' || formData.otp.trim().length >= 4) {
+      setOtpVerified(true);
+      setOtpError('');
+    } else {
+      setOtpError('Invalid OTP. Use code 1234 for demo verification.');
     }
   };
 
+  // Step 3 submission handler
+  const handleDetailsSubmit = (e) => {
+    e.preventDefault();
+
+    if (!formData.firstName || !formData.lastName || !formData.mobile || !formData.email || !formData.location) {
+      alert('Please fill out all required details.');
+      return;
+    }
+
+    if (!otpVerified) {
+      if (formData.otp.length >= 4) {
+        setOtpVerified(true);
+      } else {
+        setOtpError('Please verify your mobile number with OTP.');
+        return;
+      }
+    }
+
+    if (paymentMethod === 'prepaid') {
+      setIsRazorpayOpen(true);
+    } else {
+      goToStep(4, 'next');
+    }
+  };
+
+  // Razorpay Pay Trigger
+  const handleRazorpayPay = () => {
+    setRazorpayProcessing(true);
+    setTimeout(() => {
+      setRazorpayProcessing(false);
+      setRazorpaySuccess(true);
+      setTimeout(() => {
+        setIsRazorpayOpen(false);
+        goToStep(4, 'next');
+      }, 700);
+    }, 1200);
+  };
+
+  if (!outfit) return null;
+
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="modal-container rental-step-modal modal-lexend"
+        ref={modalBoxRef}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Modal Close Button */}
         <button className="modal-close-btn" onClick={onClose} aria-label="Close modal">
           <CloseIcon size={20} />
         </button>
 
-        {successBooking ? (
-          <div style={{ textAlign: 'center', padding: '30px 10px' }}>
-            <div style={{ 
-              width: '64px', 
-              height: '64px', 
-              borderRadius: '50%', 
-              backgroundColor: '#E8F5E9', 
-              color: '#2E7D32', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center', 
-              margin: '0 auto 20px auto' 
-            }}>
-              <CheckIcon size={32} />
+        {/* Stepper Bar at Top */}
+        {step < 4 && (
+          <div className="modal-stepper-bar">
+            <div className={`stepper-step ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
+              <div className="stepper-circle">{step > 1 ? '✓' : '1'}</div>
+              <span className="stepper-label">Dates</span>
             </div>
-            <h2 style={{ fontSize: '2rem', color: 'var(--color-charcoal)', marginBottom: '10px' }}>
-              Twirl Slot Reserved!
-            </h2>
-            <p style={{ color: 'var(--color-charcoal-muted)', marginBottom: '24px', fontSize: '1.05rem' }}>
-              Your booking ID is <strong style={{ color: 'var(--color-charcoal)' }}>{successBooking.id}</strong>. Our fitting stylist in {successBooking.city} will dispatch your sanitized fit on {successBooking.startDate || 'your selected date'}.
-            </p>
-
-            <div style={{ 
-              backgroundColor: '#FAF0EE', 
-              borderRadius: '16px', 
-              padding: '20px', 
-              textAlign: 'left', 
-              maxWidth: '440px', 
-              margin: '0 auto 28px auto',
-              border: '1px solid var(--border-light)'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.92rem' }}>
-                <span>Outfit:</span>
-                <strong>{successBooking.outfitName}</strong>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.92rem' }}>
-                <span>Size & Duration:</span>
-                <strong>Size {successBooking.size} • {successBooking.days} Days</strong>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.92rem' }}>
-                <span>Rental Fee:</span>
-                <strong>₹{successBooking.totalRent?.toLocaleString()}</strong>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.92rem', color: 'var(--color-rose)' }}>
-                <span>Refundable Deposit:</span>
-                <strong>₹{successBooking.refundableDeposit?.toLocaleString()}</strong>
-              </div>
+            <div className={`stepper-line ${step >= 2 ? 'active' : ''}`} />
+            <div className={`stepper-step ${step >= 2 ? 'active' : ''} ${step > 2 ? 'completed' : ''}`}>
+              <div className="stepper-circle">{step > 2 ? '✓' : '2'}</div>
+              <span className="stepper-label">Payment</span>
             </div>
-
-            <button className="btn-primary" onClick={onClose}>
-              <span>Back to Collection</span>
-            </button>
-          </div>
-        ) : (
-          <div>
-            <div style={{ marginBottom: '24px' }}>
-              <span className="section-tag">
-                <SparkleIcon size={14} /> Instant Rental Booking
-              </span>
-              <h2 style={{ fontSize: '2rem', color: 'var(--color-charcoal)' }}>{outfit.name}</h2>
-              <p style={{ color: 'var(--color-charcoal-muted)', fontSize: '0.95rem' }}>
-                Navratri Day {outfit.navratriDay} Edition • {outfit.colorTheme}
-              </p>
-            </div>
-
-            <div className="modal-grid">
-              <div style={{ position: 'relative' }}>
-                <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px' }}>
-                  <img 
-                    src={(outfit.images && outfit.images[modalImgIdx]) || outfit.image} 
-                    alt={outfit.name} 
-                    className="modal-preview-img"
-                    onError={(e) => { e.currentTarget.src = outfit.image || '/assets/2.png'; }}
-                  />
-                  {outfit.images && outfit.images.length > 1 && (
-                    <>
-                      <button
-                        type="button"
-                        className="modal-arrow-btn modal-arrow-prev"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setModalImgIdx((prev) => (prev === 0 ? outfit.images.length - 1 : prev - 1));
-                        }}
-                        aria-label="Previous preview"
-                        title="Previous preview"
-                      >
-                        <ChevronLeftIcon size={18} />
-                      </button>
-                      <button
-                        type="button"
-                        className="modal-arrow-btn modal-arrow-next"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setModalImgIdx((prev) => (prev === outfit.images.length - 1 ? 0 : prev + 1));
-                        }}
-                        aria-label="Next preview"
-                        title="Next preview"
-                      >
-                        <ChevronRightIcon size={18} />
-                      </button>
-                      <div className="modal-dots-container">
-                        {outfit.images.map((_, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            className={`modal-dot ${idx === modalImgIdx ? 'active' : ''}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setModalImgIdx(idx);
-                            }}
-                            aria-label={`View image ${idx + 1}`}
-                          />
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-                <div style={{ marginTop: '14px', fontSize: '0.85rem', color: 'var(--color-charcoal-muted)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                    <ShieldCheckIcon size={16} /> 100% Sanitized & Steam Pressed
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <SparkleIcon size={16} /> Blouse Margin: +2 inches alterable
-                  </div>
-                </div>
-              </div>
-
-              <form onSubmit={handleSubmit} className="modal-form">
-                <div className="form-group">
-                  <label>Full Name</label>
-                  <input 
-                    type="text" 
-                    required 
-                    placeholder="e.g. Priyanshi Mehta"
-                    value={formData.customerName}
-                    onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div className="form-group">
-                    <label>Phone Number</label>
-                    <input 
-                      type="tel" 
-                      required 
-                      placeholder="+91 98765 43210"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>City Hub</label>
-                    <select 
-                      value={formData.city}
-                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    >
-                      <option value="Ahmedabad">Ahmedabad Hub</option>
-                      <option value="Mumbai">Mumbai Hub</option>
-                      <option value="Surat">Surat Hub</option>
-                      <option value="Vadodara">Vadodara Hub</option>
-                      <option value="Bangalore">Bangalore (Courier)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '12px' }}>
-                  <div className="form-group">
-                    <label>Wear Date</label>
-                    <input 
-                      type="date" 
-                      required 
-                      value={formData.startDate}
-                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Duration</label>
-                    <select 
-                      value={formData.days}
-                      onChange={(e) => setFormData({ ...formData, days: e.target.value })}
-                    >
-                      <option value="3">3 Days (Standard)</option>
-                      <option value="5">5 Days (+30%)</option>
-                      <option value="9">All 9 Nights</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label>Size</label>
-                    <select 
-                      value={formData.size}
-                      onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                    >
-                      {outfit.sizes.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="deposit-notice">
-                  <strong>Estimated Rent: ₹{estimatedRent.toLocaleString()}</strong> + ₹{outfit.deposit.toLocaleString()} 100% Refundable Security Deposit upon return.
-                </div>
-
-                <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', marginTop: '6px' }}>
-                  <span>{loading ? 'Securing Slot...' : 'Confirm & Reserve Fit'}</span>
-                </button>
-              </form>
+            <div className={`stepper-line ${step >= 3 ? 'active' : ''}`} />
+            <div className={`stepper-step ${step >= 3 ? 'active' : ''}`}>
+              <div className="stepper-circle">3</div>
+              <span className="stepper-label">Details</span>
             </div>
           </div>
         )}
+
+        {/* Step Container (Sliding Viewport) */}
+        <div className="rental-step-viewport">
+          <div className="rental-step-content" ref={stepContainerRef}>
+
+            {/* ══════════════════════════════════════════════
+                STEP 1: SELECT DATES WITH PRODUCT IMG ON LEFT
+               ══════════════════════════════════════════════ */}
+            {step === 1 && (
+              <div className="step-pane step-date-pane">
+                <div className="step-date-split-layout">
+                  {/* Left Column: Both Preview Images Stacked Vertically */}
+                  <div className="step-date-product-left">
+                    <div className="product-previews-stack">
+                      {(outfit.images && outfit.images.length > 0 ? outfit.images : [outfit.image]).map((imgSrc, idx) => (
+                        <div key={idx} className="product-preview-card">
+                          <img
+                            src={imgSrc}
+                            alt={`${outfit.name} view ${idx + 1}`}
+                            onError={(e) => { e.currentTarget.src = outfit.image || '/assets/outfits/p1a.png'; }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Calendar, Total Amount & Next Button */}
+                  <div className="step-date-calendar-right">
+                    <div className="festive-calendar-card">
+                      {/* Month Navigation Header */}
+                      <div className="calendar-nav-header">
+                        <button
+                          type="button"
+                          className="cal-arrow-btn"
+                          onClick={handlePrevMonth}
+                          aria-label="Previous month"
+                        >
+                          <ChevronLeftIcon size={18} />
+                        </button>
+                        <div className="cal-month-title">
+                          {monthNames[cMonth]} {cYear}
+                        </div>
+                        <button
+                          type="button"
+                          className="cal-arrow-btn"
+                          onClick={handleNextMonth}
+                          aria-label="Next month"
+                        >
+                          <ChevronRightIcon size={18} />
+                        </button>
+                      </div>
+
+                      {/* Day Names Row */}
+                      <div className="calendar-weekdays-grid">
+                        {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
+                          <div key={d} className="cal-weekday-cell">
+                            {d}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Calendar Days Matrix */}
+                      <div className="calendar-days-grid">
+                        {Array.from({ length: startDay }).map((_, idx) => (
+                          <div key={`empty-${idx}`} className="cal-day-cell empty" />
+                        ))}
+
+                        {Array.from({ length: totalDays }).map((_, idx) => {
+                          const dayNum = idx + 1;
+                          const isPast = isDateInPast(dayNum);
+                          const isSel = isDateSelected(dayNum);
+
+                          return (
+                            <button
+                              key={`day-${dayNum}`}
+                              type="button"
+                              disabled={isPast}
+                              className={`cal-day-cell ${isPast ? 'disabled' : 'active-date'} ${isSel ? 'selected' : ''}`}
+                              onClick={() => handleDateClick(dayNum)}
+                            >
+                              <span className="cal-day-number">{dayNum}</span>
+                              {isSel && <span className="cal-selected-dot" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Total Amount below calendar */}
+                    <div className="calendar-total-amount-bar">
+                      <div className="total-amount-val">
+                        Total Amount: <strong>₹{numNights > 0 ? (numNights * pricePerNight).toLocaleString() : '0'}</strong>
+                      </div>
+                    </div>
+
+                    {/* Button below Total Amount */}
+                    <div className="step-actions-footer">
+                      <button
+                        type="button"
+                        className="btn-primary step-btn-next btn-theme-rose"
+                        disabled={selectedDates.length === 0}
+                        onClick={() => goToStep(2, 'next')}
+                      >
+                        <span>Select Payment Method</span>
+                        <ArrowRightIcon size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ══════════════════════════════════════════════
+                STEP 2: PAYMENT METHOD (3 Options: Icon + Title only)
+               ══════════════════════════════════════════════ */}
+            {step === 2 && (
+              <div className="step-pane step-payment-pane">
+                {/* 3 Payment Options */}
+                <div className="payment-options-stack">
+                  {/* 1. Cash on Delivery */}
+                  <div
+                    className={`payment-option-card ${paymentMethod === 'cod' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('cod')}
+                  >
+                    <div className="payment-icon-wrap cod-icon">
+                      <BanknoteIcon size={24} />
+                    </div>
+                    <div className="payment-option-text">
+                      <div className="payment-option-title">Cash on Delivery</div>
+                    </div>
+                  </div>
+
+                  {/* 2. Prepaid */}
+                  <div
+                    className={`payment-option-card ${paymentMethod === 'prepaid' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('prepaid')}
+                  >
+                    <div className="payment-icon-wrap prepaid-icon">
+                      <CreditCardIcon size={24} />
+                    </div>
+                    <div className="payment-option-text">
+                      <div className="payment-option-title">Prepaid</div>
+                    </div>
+                  </div>
+
+                  {/* 3. Try Before Purchase */}
+                  <div
+                    className={`payment-option-card ${paymentMethod === 'trial' ? 'selected' : ''}`}
+                    onClick={() => setPaymentMethod('trial')}
+                  >
+                    <div className="payment-icon-wrap trial-icon">
+                      <FittingIcon size={24} />
+                    </div>
+                    <div className="payment-option-text">
+                      <div className="payment-option-title">Try Before Purchase</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions Footer */}
+                <div className="step-actions-footer dual-actions">
+                  <button
+                    type="button"
+                    className="btn-secondary step-btn-back"
+                    onClick={() => goToStep(1, 'prev')}
+                  >
+                    <ChevronLeftIcon size={16} />
+                    <span>Back</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-primary step-btn-next btn-theme-rose"
+                    disabled={!paymentMethod}
+                    onClick={() => goToStep(3, 'next')}
+                  >
+                    <span>Enter Details</span>
+                    <ArrowRightIcon size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ══════════════════════════════════════════════
+                STEP 3: USER DETAILS
+               ══════════════════════════════════════════════ */}
+            {step === 3 && (
+              <div className="step-pane step-details-pane">
+                <form onSubmit={handleDetailsSubmit} className="details-form-stack">
+                  {/* First Name & Last Name */}
+                  <div className="form-row-2col">
+                    <div className="form-field-group">
+                      <label>First Name *</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.firstName}
+                        onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      />
+                    </div>
+                    <div className="form-field-group">
+                      <label>Last Name *</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.lastName}
+                        onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mobile Number & OTP Verification */}
+                  <div className="form-field-group">
+                    <label>Mobile Number *</label>
+                    <div className="input-with-action">
+                      <span className="input-prefix">+91</span>
+                      <input
+                        type="tel"
+                        required
+                        maxLength={10}
+                        value={formData.mobile}
+                        onChange={(e) => {
+                          setFormData({ ...formData, mobile: e.target.value });
+                          setOtpVerified(false);
+                        }}
+                      />
+                      {!otpVerified ? (
+                        <button
+                          type="button"
+                          className="btn-input-action"
+                          onClick={handleSendOtp}
+                        >
+                          {otpSent ? 'Resend OTP' : 'Send OTP'}
+                        </button>
+                      ) : (
+                        <span className="verified-pill">
+                          <CheckIcon size={14} /> Verified
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* OTP Verification Input Box */}
+                  {otpSent && !otpVerified && (
+                    <div className="otp-verification-box">
+                      <div className="otp-input-row">
+                        <input
+                          type="text"
+                          maxLength={6}
+                          value={formData.otp}
+                          onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
+                        />
+                        <button
+                          type="button"
+                          className="btn-primary btn-verify-otp"
+                          onClick={handleVerifyOtp}
+                        >
+                          Verify
+                        </button>
+                      </div>
+                      {otpError && <span className="otp-error-msg">{otpError}</span>}
+                    </div>
+                  )}
+
+                  {/* Email */}
+                  <div className="form-field-group">
+                    <label>Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Location / Campus Address */}
+                  <div className="form-field-group">
+                    <label>Delivery / Fitting Location *</label>
+                    <div className="input-location-wrap">
+                      <input
+                        type="text"
+                        required
+                        value={formData.location}
+                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Actions Footer */}
+                  <div className="step-actions-footer dual-actions">
+                    <button
+                      type="button"
+                      className="btn-secondary step-btn-back"
+                      onClick={() => goToStep(2, 'prev')}
+                    >
+                      <ChevronLeftIcon size={16} />
+                      <span>Back</span>
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="btn-primary step-btn-submit"
+                    >
+                      {paymentMethod === 'cod' && <span>Confirm COD Booking (₹{(numNights * pricePerNight).toLocaleString()})</span>}
+                      {paymentMethod === 'prepaid' && <span>Pay with Razorpay (₹{(numNights * pricePerNight).toLocaleString()})</span>}
+                      {paymentMethod === 'trial' && <span>Reserve Free Trial Slot</span>}
+                      <ArrowRightIcon size={16} />
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            {/* ══════════════════════════════════════════════
+                STEP 4: DYNAMIC CONFIRMATION SCREEN
+               ══════════════════════════════════════════════ */}
+            {step === 4 && (
+              <div className="step-pane step-confirmation-pane">
+                {/* 1. Cash on Delivery Confirmation */}
+                {paymentMethod === 'cod' && (
+                  <div className="confirmation-card">
+                    <div className="confirmation-icon-bubble green">
+                      <CheckIcon size={34} />
+                    </div>
+                    <span className="confirmation-badge cod">Cash on Delivery Placed</span>
+                    <h2 className="confirmation-title">Booking Reserved!</h2>
+
+                    <div className="confirmation-highlight-message">
+                      "We'll get in touch with you shortly to confirm your order and coordinate the delivery!"
+                    </div>
+
+                    <div className="confirmation-summary-box">
+                      <div className="summary-line">
+                        <span>Outfit:</span>
+                        <strong>{outfit.name}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Rental Dates:</span>
+                        <strong>{formatDisplayDates(selectedDates)} ({numNights} {numNights === 1 ? 'Night' : 'Nights'})</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Payment Mode:</span>
+                        <strong>Cash on Delivery (₹{(numNights * pricePerNight).toLocaleString()})</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Contact Mobile:</span>
+                        <strong>+91 {formData.mobile}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Delivery Location:</span>
+                        <strong>{formData.location}</strong>
+                      </div>
+                    </div>
+
+                    <button className="btn-primary btn-confirmation-close" onClick={onClose}>
+                      <span>Done & Back to Collection</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* 2. Prepaid Confirmation */}
+                {paymentMethod === 'prepaid' && (
+                  <div className="confirmation-card">
+                    <div className="confirmation-icon-bubble purple">
+                      <SparkleIcon size={34} />
+                    </div>
+                    <span className="confirmation-badge prepaid">Razorpay Payment Verified</span>
+                    <h2 className="confirmation-title">Payment Successful!</h2>
+
+                    <div className="confirmation-highlight-message">
+                      "We have shared the booking details with you at <strong>{formData.email || 'your email'}</strong>. For any questions, contact us via{' '}
+                      <button
+                        type="button"
+                        className="inline-contact-link"
+                        onClick={() => {
+                          onClose();
+                          if (onNavigateTab) onNavigateTab('contact');
+                        }}
+                      >
+                        Contact Us
+                      </button>
+                      ."
+                    </div>
+
+                    <div className="confirmation-summary-box">
+                      <div className="summary-line">
+                        <span>Transaction ID:</span>
+                        <strong style={{ color: 'var(--color-rose)' }}>RZP-GF-{Math.floor(100000 + Math.random() * 900000)}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Outfit:</span>
+                        <strong>{outfit.name}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Rental Dates:</span>
+                        <strong>{formatDisplayDates(selectedDates)} ({numNights} {numNights === 1 ? 'Night' : 'Nights'})</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Amount Paid:</span>
+                        <strong>₹{(numNights * pricePerNight).toLocaleString()}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Receipt Sent To:</span>
+                        <strong>{formData.email}</strong>
+                      </div>
+                    </div>
+
+                    <button className="btn-primary btn-confirmation-close" onClick={onClose}>
+                      <span>Done & Back to Collection</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* 3. Try Before Purchase Confirmation */}
+                {paymentMethod === 'trial' && (
+                  <div className="confirmation-card">
+                    <div className="confirmation-icon-bubble blue">
+                      <FittingIcon size={34} />
+                    </div>
+                    <span className="confirmation-badge trial">Trial Fitting Booked</span>
+                    <h2 className="confirmation-title">Trial Slot Scheduled!</h2>
+
+                    <div className="confirmation-highlight-message">
+                      "We'll soon contact you with the outfit ready for trial!"
+                    </div>
+
+                    <div className="confirmation-summary-box">
+                      <div className="summary-line">
+                        <span>Outfit for Trial:</span>
+                        <strong>{outfit.name}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Trial Dates:</span>
+                        <strong>{formatDisplayDates(selectedDates)}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Fitting Location:</span>
+                        <strong>{formData.location}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Customer Name:</span>
+                        <strong>{formData.firstName} {formData.lastName}</strong>
+                      </div>
+                      <div className="summary-line">
+                        <span>Helpline Contact:</span>
+                        <strong>+91 98765 43210 (Stylist Desk)</strong>
+                      </div>
+                    </div>
+
+                    <button className="btn-primary btn-confirmation-close" onClick={onClose}>
+                      <span>Done & Back to Collection</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+          </div>
+        </div>
+
+        {/* ══════════════════════════════════════════════
+            RAZORPAY CHECKOUT MODAL OVERLAY (FOR PREPAID)
+           ══════════════════════════════════════════════ */}
+        {isRazorpayOpen && (
+          <div className="razorpay-modal-overlay">
+            <div className="razorpay-gateway-box modal-lexend">
+              <div className="razorpay-header">
+                <div className="razorpay-brand">
+                  <div className="razorpay-logo-icon">⚡</div>
+                  <div>
+                    <div className="razorpay-merchant-name">GarbaFits Rentals</div>
+                    <div className="razorpay-order-id">Order #GF-{Date.now().toString().slice(-5)}</div>
+                  </div>
+                </div>
+                <div className="razorpay-amount">
+                  ₹{(numNights * pricePerNight).toLocaleString()}
+                </div>
+              </div>
+
+              {razorpayProcessing ? (
+                <div className="razorpay-loading-view">
+                  <div className="razorpay-spinner" />
+                  <div className="razorpay-loading-text">Processing Secure Payment via Razorpay...</div>
+                  <div className="razorpay-sub-text">Please do not close this window</div>
+                </div>
+              ) : razorpaySuccess ? (
+                <div className="razorpay-success-view">
+                  <div className="razorpay-success-icon">✓</div>
+                  <div className="razorpay-success-title">Payment Approved!</div>
+                </div>
+              ) : (
+                <div className="razorpay-body">
+                  <div className="razorpay-payment-methods">
+                    <div
+                      className={`rzp-method-item ${razorpayMethod === 'upi' ? 'active' : ''}`}
+                      onClick={() => setRazorpayMethod('upi')}
+                    >
+                      <span>📱 UPI (GPay / PhonePe / Paytm / BHIM)</span>
+                    </div>
+                    <div
+                      className={`rzp-method-item ${razorpayMethod === 'cards' ? 'active' : ''}`}
+                      onClick={() => setRazorpayMethod('cards')}
+                    >
+                      <span>💳 Credit / Debit Card / ATM</span>
+                    </div>
+                    <div
+                      className={`rzp-method-item ${razorpayMethod === 'netbanking' ? 'active' : ''}`}
+                      onClick={() => setRazorpayMethod('netbanking')}
+                    >
+                      <span>🏛️ Netbanking / All Indian Banks</span>
+                    </div>
+                  </div>
+
+                  <div className="rzp-prefill-info">
+                    <span>Paying as: <strong>{formData.firstName} {formData.lastName}</strong> ({formData.email})</span>
+                  </div>
+
+                  <div className="razorpay-actions">
+                    <button
+                      type="button"
+                      className="rzp-cancel-btn"
+                      onClick={() => setIsRazorpayOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      className="rzp-pay-btn"
+                      onClick={handleRazorpayPay}
+                    >
+                      Pay ₹{(numNights * pricePerNight).toLocaleString()}
+                    </button>
+                  </div>
+
+                  <div className="razorpay-footer-badge">
+                    🔒 Secured by Razorpay 256-bit Encryption
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

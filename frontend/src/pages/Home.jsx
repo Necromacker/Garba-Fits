@@ -1173,6 +1173,7 @@ export default function Home({
         <RentalModal
           outfit={selectedOutfit}
           onClose={() => setSelectedOutfit(null)}
+          onNavigateTab={requestTransition}
         />
       )}
     </div>
