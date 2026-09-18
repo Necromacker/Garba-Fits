@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { CloseIcon, CheckIcon, ShieldCheckIcon, SparkleIcon } from './Icons';
+import { CloseIcon, CheckIcon, ShieldCheckIcon, SparkleIcon, ChevronLeftIcon, ChevronRightIcon } from './Icons';
 
 export default function RentalModal({ outfit, onClose, onBookingSuccess }) {
+  const [modalImgIdx, setModalImgIdx] = useState(0);
   const [formData, setFormData] = useState({
     customerName: '',
     email: '',
@@ -136,13 +137,57 @@ export default function RentalModal({ outfit, onClose, onBookingSuccess }) {
             </div>
 
             <div className="modal-grid">
-              <div>
-                <img 
-                  src={outfit.image} 
-                  alt={outfit.name} 
-                  className="modal-preview-img"
-                  onError={(e) => { e.currentTarget.src = 'assets/outfits/outfit1.png'; }}
-                />
+              <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '16px' }}>
+                  <img 
+                    src={(outfit.images && outfit.images[modalImgIdx]) || outfit.image} 
+                    alt={outfit.name} 
+                    className="modal-preview-img"
+                    onError={(e) => { e.currentTarget.src = outfit.image || '/assets/2.png'; }}
+                  />
+                  {outfit.images && outfit.images.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        className="modal-arrow-btn modal-arrow-prev"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModalImgIdx((prev) => (prev === 0 ? outfit.images.length - 1 : prev - 1));
+                        }}
+                        aria-label="Previous preview"
+                        title="Previous preview"
+                      >
+                        <ChevronLeftIcon size={18} />
+                      </button>
+                      <button
+                        type="button"
+                        className="modal-arrow-btn modal-arrow-next"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setModalImgIdx((prev) => (prev === outfit.images.length - 1 ? 0 : prev + 1));
+                        }}
+                        aria-label="Next preview"
+                        title="Next preview"
+                      >
+                        <ChevronRightIcon size={18} />
+                      </button>
+                      <div className="modal-dots-container">
+                        {outfit.images.map((_, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            className={`modal-dot ${idx === modalImgIdx ? 'active' : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setModalImgIdx(idx);
+                            }}
+                            aria-label={`View image ${idx + 1}`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
                 <div style={{ marginTop: '14px', fontSize: '0.85rem', color: 'var(--color-charcoal-muted)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
                     <ShieldCheckIcon size={16} /> 100% Sanitized & Steam Pressed

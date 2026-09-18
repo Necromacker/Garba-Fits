@@ -1,19 +1,65 @@
-import React from 'react';
-import { SparkleIcon, StarIcon, ArrowRightIcon } from './Icons';
+import React, { useState } from 'react';
+import { SparkleIcon, StarIcon, ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon } from './Icons';
 
 export default function OutfitCard({ outfit, onRentClick }) {
+  const images = outfit.images && outfit.images.length > 0 ? outfit.images : [outfit.image];
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  const handlePrev = (e) => {
+    e.stopPropagation();
+    setCurrentIdx((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNext = (e) => {
+    e.stopPropagation();
+    setCurrentIdx((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
   return (
     <div className="outfit-card">
-      <div className="card-image-wrap">
+      <div className="card-image-wrap" style={{ position: 'relative' }}>
         <img
-          src={outfit.image}
-          alt={outfit.name}
+          src={images[currentIdx]}
+          alt={`${outfit.name} - view ${currentIdx + 1}`}
           loading="lazy"
           onError={(e) => {
-            // fallback to local outfit1 if needed
-            e.currentTarget.src = 'assets/outfits/outfit1.png';
+            e.currentTarget.src = outfit.image || '/assets/2.png';
           }}
         />
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="card-arrow-btn card-arrow-prev"
+              onClick={handlePrev}
+              aria-label="Previous preview"
+            >
+              <ChevronLeftIcon size={14} />
+            </button>
+            <button
+              type="button"
+              className="card-arrow-btn card-arrow-next"
+              onClick={handleNext}
+              aria-label="Next preview"
+            >
+              <ChevronRightIcon size={14} />
+            </button>
+            <div className="card-dots-container">
+              {images.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`card-dot ${idx === currentIdx ? 'active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentIdx(idx);
+                  }}
+                  aria-label={`View image ${idx + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
         <span className="day-pill-badge">
           Day {outfit.navratriDay} • {outfit.colorTheme.split('&')[0]}
         </span>
