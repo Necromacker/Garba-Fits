@@ -2,121 +2,121 @@
   {
     "id": "gfit-01",
     "name": "Peacock Mirrorwork Choli",
-    "price": 700,
-    "deposit": 2000
+    "price": 900,
+    "deposit": 900
   },
   {
     "id": "gfit-02",
     "name": "Sunkissed Marigold Rabari",
-    "price": 340,
-    "deposit": 2500
+    "price": 900,
+    "deposit": 900
   },
   {
     "id": "gfit-03",
     "name": "Magenta Rani Bandhani",
-    "price": 1,
-    "deposit": 2
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-04",
     "name": "Heritage Kutchi Patchwork",
     "price": 700,
-    "deposit": 2500
+    "deposit": 700
   },
   {
     "id": "gfit-05",
     "name": "Emerald Gamthi Gher",
-    "price": 700,
-    "deposit": 2200
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-06",
     "name": "Sunset Amber Abhala",
-    "price": 700,
-    "deposit": 2400
+    "price": 900,
+    "deposit": 900
   },
   {
     "id": "gfit-07",
     "name": "Midnight Starlight Mirror",
-    "price": 700,
-    "deposit": 2200
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-08",
     "name": "Scarlet Golden Zari",
-    "price": 700,
-    "deposit": 2500
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-09",
     "name": "Aasmani Mirrorwork Ghagra",
     "price": 700,
-    "deposit": 2200
+    "deposit": 700
   },
   {
     "id": "gfit-10",
     "name": "Gulabi Kesariya Bandhej",
-    "price": 700,
-    "deposit": 2400
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-11",
     "name": "Noorani Black Abhala",
-    "price": 700,
-    "deposit": 2500
+    "price": 400,
+    "deposit": 400
   },
   {
     "id": "gfit-12",
     "name": "Surajmukhi Yellow Gamthi",
-    "price": 700,
-    "deposit": 2000
+    "price": 400,
+    "deposit": 400
   },
   {
     "id": "gfit-13",
     "name": "Teal Mayura Gamthi",
-    "price": 700,
-    "deposit": 2300
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-14",
     "name": "Lavender Pastel Mirror",
-    "price": 700,
-    "deposit": 2200
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-15",
     "name": "Mint Green Gota Patti",
-    "price": 700,
-    "deposit": 2500
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-16",
     "name": "Sindhuri Maroon Ahir",
-    "price": 700,
-    "deposit": 2500
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-17",
     "name": "Champakali Silk Brocade",
-    "price": 700,
-    "deposit": 2200
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-18",
     "name": "Charcoal Neon Mirror",
-    "price": 700,
-    "deposit": 2400
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-19",
     "name": "Padmavati Crimson Rani",
-    "price": 700,
-    "deposit": 2600
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-20",
     "name": "Turquoise Bandhani Set",
-    "price": 700,
-    "deposit": 2100
+    "price": 100,
+    "deposit": 100
   }
 ]
