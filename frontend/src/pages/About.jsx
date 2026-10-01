@@ -39,7 +39,7 @@ export default function About() {
               <div className="owner-profile-card stagger-up">
                 <div className="owner-avatar-frame">
                   <img
-                    src="/assets/owner1.png"
+                    src="/assets/owner1.webp"
                     alt="Krishna"
                   />
                   <div className="owner-floating-name">Krishna</div>
@@ -81,7 +81,7 @@ export default function About() {
               <div className="owner-profile-card stagger-down">
                 <div className="owner-avatar-frame">
                   <img
-                    src="/assets/owner2.png"
+                    src="/assets/owner2.webp"
                     alt="Vruti Moradiya"
                   />
                   <div className="owner-floating-name">Vruti Moradiya</div>

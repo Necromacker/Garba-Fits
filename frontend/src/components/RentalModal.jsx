@@ -14,13 +14,13 @@ import {
 } from './Icons';
 
 const getOutfitImages = (outfit) => {
-  if (!outfit) return ['/assets/outfits/p1a.png'];
+  if (!outfit) return ['/assets/outfits/p1a.webp'];
   if (outfit.images && outfit.images.length > 0) return outfit.images;
   if (outfit.image) return [outfit.image];
   const num = parseInt(outfit.id?.replace(/\D/g, '') || '1', 10);
   return num <= 12
-    ? [`/assets/outfits/p${num}a.png`, `/assets/outfits/p${num}b.png`]
-    : [`/assets/outfits/p${num}a.png`];
+    ? [`/assets/outfits/p${num}a.webp`, `/assets/outfits/p${num}b.webp`]
+    : [`/assets/outfits/p${num}a.webp`];
 };
 
 export default function RentalModal({ outfit, onClose, onNavigateTab }) {
@@ -391,7 +391,7 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
                           <img
                             src={imgSrc}
                             alt={`${outfit.name} view ${idx + 1}`}
-                            onError={(e) => { e.currentTarget.src = '/assets/outfits/p1a.png'; }}
+                            onError={(e) => { e.currentTarget.src = '/assets/outfits/p1a.webp'; }}
                           />
                         </div>
                       ))}

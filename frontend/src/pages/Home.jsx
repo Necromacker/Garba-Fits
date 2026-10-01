@@ -7,7 +7,7 @@ import '../styles/style-home.css';
 import '../styles/style-about.css';
 import '../styles/style-contact.css';
 
-const heroImg = '/assets/1.png';
+const heroImg = '/assets/1.webp';
 
 /* ── Caption carousel data ── */
 const CAPTIONS = [
@@ -17,13 +17,13 @@ const CAPTIONS = [
 ];
 
 const getOutfitImages = (outfit) => {
-  if (!outfit) return ['/assets/outfits/p1a.png'];
+  if (!outfit) return ['/assets/outfits/p1a.webp'];
   if (outfit.images && outfit.images.length > 0) return outfit.images;
   if (outfit.image) return [outfit.image];
   const num = parseInt(outfit.id?.replace(/\D/g, '') || '1', 10);
   return num <= 12
-    ? [`/assets/outfits/p${num}a.png`, `/assets/outfits/p${num}b.png`]
-    : [`/assets/outfits/p${num}a.png`];
+    ? [`/assets/outfits/p${num}a.webp`, `/assets/outfits/p${num}b.webp`]
+    : [`/assets/outfits/p${num}a.webp`];
 };
 
 /* ── Outfit Card Component: Image Carousel with GSAP Slide, Price tag + two buttons below ── */
@@ -76,7 +76,7 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
                 alt={`${outfit.name} - view ${idx + 1}`}
                 loading={idx === 0 ? "eager" : "lazy"}
                 onError={(e) => {
-                  e.currentTarget.src = outfit.image || '/assets/outfits/p1a.png';
+                  e.currentTarget.src = outfit.image || '/assets/outfits/p1a.webp';
                 }}
               />
             </div>
@@ -501,7 +501,7 @@ export default function Home({
                   <span className="headline-word text-rose">Wear</span>{' '}
                   <span className="headline-word text-charcoal">it,</span>{' '}
                   <span className="hero-pill-frame">
-                    <img src="/assets/hero-pill.jpg" alt="Celebratory Garba dancers" />
+                    <img src="/assets/hero-pill.webp" alt="Celebratory Garba dancers" />
                   </span>
                   <br />
                   <span className="headline-word text-charcoal">Then</span>{' '}
@@ -595,7 +595,7 @@ export default function Home({
                 <div className="owner-profile-card stagger-up">
                   <div className="owner-avatar-frame">
                     <img
-                      src="/assets/owner1.png"
+                      src="/assets/owner1.webp"
                       alt="Krishna"
                     />
                     <div className="owner-floating-name">Krishna</div>
@@ -637,7 +637,7 @@ export default function Home({
                 <div className="owner-profile-card stagger-down">
                   <div className="owner-avatar-frame">
                     <img
-                      src="/assets/owner2.png"
+                      src="/assets/owner2.webp"
                       alt="Vruti Moradiya"
                     />
                     <div className="owner-floating-name">Vruti Moradiya</div>
@@ -686,7 +686,7 @@ export default function Home({
             <div className="contact-phone-col">
               <div className="contact-phone-frame">
                 <img
-                  src="/assets/contact-phone.jpg"
+                  src="/assets/contact-phone.webp"
                   alt="Retro Hello Phone"
                 />
               </div>
@@ -761,7 +761,7 @@ export default function Home({
                   <img
                     src={imgSrc}
                     alt={`${viewModalOutfit.name} view ${idx + 1}`}
-                    onError={(e) => { e.currentTarget.src = '/assets/outfits/p1a.png'; }}
+                    onError={(e) => { e.currentTarget.src = '/assets/outfits/p1a.webp'; }}
                   />
                 </div>
               ))}

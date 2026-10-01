@@ -23,7 +23,7 @@ export default function OutfitCard({ outfit, onRentClick }) {
           alt={`${outfit.name} - view ${currentIdx + 1}`}
           loading="lazy"
           onError={(e) => {
-            e.currentTarget.src = outfit.image || '/assets/2.png';
+            e.currentTarget.src = outfit.image || '/assets/outfits/p1a.webp';
           }}
         />
         {images.length > 1 && (
