@@ -224,7 +224,7 @@ app.post(['/api/logs/rent-click', '/api/logs/click-rent', '/api/analytics/rent-c
   console.log(`🛒 [RENT CLICKED] User opened rental for:`);
   console.log(`👗 Name:    ${outfitName || 'Unknown Product'}`);
   console.log(`🆔 ID:      ${outfitId || 'N/A'}`);
-  if (price !== undefined)   console.log(`💰 Rent:    ₹${price}`);
+  if (price !== undefined) console.log(`💰 Rent:    ₹${price}`);
   if (deposit !== undefined) console.log(`🛡️ Deposit: ₹${deposit}`);
   console.log(`⏰ Time:    ${timestamp}`);
   console.log(`======================================================\n`);
