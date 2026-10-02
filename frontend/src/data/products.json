@@ -1,242 +1,242 @@
 [
   {
     "id": "gfit-01",
-    "name": "Peacock Mirrorwork Choli",
-    "price": 700,
-    "deposit": 2000
+    "name": "Cherry Red Chaniya",
+    "price": 900,
+    "deposit": 900
   },
   {
     "id": "gfit-02",
-    "name": "Sunkissed Marigold Rabari",
-    "price": 340,
-    "deposit": 2500
+    "name": "Ivory Maroon Striped Chaniya",
+    "price": 900,
+    "deposit": 900
   },
   {
     "id": "gfit-03",
-    "name": "Magenta Rani Bandhani",
-    "price": 790,
-    "deposit": 2000
+    "name": "Charcoal Leheriya Chaniya",
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-04",
-    "name": "Heritage Kutchi Patchwork",
+    "name": "Beige Floral Ruffle Chaniya",
     "price": 700,
-    "deposit": 2500
+    "deposit": 700
   },
   {
     "id": "gfit-05",
-    "name": "Emerald Gamthi Gher",
-    "price": 700,
-    "deposit": 2200
+    "name": "Brown Multicolour Gamthi Chaniya",
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-06",
-    "name": "Sunset Amber Abhala",
-    "price": 700,
-    "deposit": 2400
+    "name": "Classic Black Mirrorwork Chaniya",
+    "price": 900,
+    "deposit": 900
   },
   {
     "id": "gfit-07",
-    "name": "Midnight Starlight Mirror",
-    "price": 700,
-    "deposit": 2200
+    "name": "Pure White Kutchi Chaniya",
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-08",
-    "name": "Scarlet Golden Zari",
-    "price": 700,
-    "deposit": 2500
+    "name": "Black Multi-Embroidered Chaniya",
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-09",
-    "name": "Aasmani Mirrorwork Ghagra",
+    "name": "Magenta Pink Silk Chaniya",
     "price": 700,
-    "deposit": 2200
+    "deposit": 700
   },
   {
     "id": "gfit-10",
-    "name": "Gulabi Kesariya Bandhej",
-    "price": 700,
-    "deposit": 2400
+    "name": "Pearl White Organza Chaniya",
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-11",
-    "name": "Noorani Black Abhala",
-    "price": 700,
-    "deposit": 2500
+    "name": "Lavender Tie-Dye Chaniya",
+    "price": 400,
+    "deposit": 400
   },
   {
     "id": "gfit-12",
-    "name": "Surajmukhi Yellow Gamthi",
-    "price": 700,
-    "deposit": 2000
+    "name": "Sand Beige Tiered Chaniya",
+    "price": 400,
+    "deposit": 400
   },
   {
     "id": "gfit-13",
-    "name": "Teal Mayura Gamthi",
+    "name": "Navy Blue Zari Chaniya",
     "price": 700,
-    "deposit": 2300
+    "deposit": 700
   },
   {
     "id": "gfit-14",
-    "name": "Lavender Pastel Mirror",
-    "price": 700,
-    "deposit": 2200
+    "name": "Indigo Zigzag Chaniya",
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-15",
-    "name": "Mint Green Gota Patti",
-    "price": 700,
-    "deposit": 2500
+    "name": "Sky Blue Pink Bandhani Dupatta",
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-16",
-    "name": "Sindhuri Maroon Ahir",
-    "price": 700,
-    "deposit": 2500
+    "name": "Ivory Embroidered Net Dupatta",
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-17",
-    "name": "Champakali Silk Brocade",
-    "price": 700,
-    "deposit": 2200
+    "name": "Multicolour Kutchi Dupatta",
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-18",
-    "name": "Charcoal Neon Mirror",
-    "price": 700,
-    "deposit": 2400
+    "name": "Mustard Yellow Bandhani Dupatta",
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-19",
-    "name": "Padmavati Crimson Rani",
-    "price": 700,
-    "deposit": 2600
+    "name": "Tricolor Mirror Bandhani Dupatta",
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-20",
-    "name": "Turquoise Bandhani Set",
-    "price": 700,
-    "deposit": 2100
+    "name": "Multicolour Gota Striped Dupatta",
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-21",
-    "name": "Navrang Royal Chaniya Set",
-    "price": 700,
-    "deposit": 2200
+    "name": "Bright Yellow Leheriya Dupatta",
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-22",
-    "name": "Radha Rani Festive Ghagra",
-    "price": 700,
-    "deposit": 2400
+    "name": "Rani Pink Organza Dupatta",
+    "price": 100,
+    "deposit": 100
   },
   {
     "id": "gfit-23",
-    "name": "Morpankhi Deep Blue Gamthi",
-    "price": 700,
-    "deposit": 2200
+    "name": "Oxidised Silver Mathapatti",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-24",
-    "name": "Kesar Kasturi Embroidered Ghagra",
-    "price": 700,
-    "deposit": 2300
+    "name": "Crystal Beaded Bun Brooch",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-25",
-    "name": "Chandrakala Silver Mirrorwork",
-    "price": 700,
-    "deposit": 2400
+    "name": "Oxidised Star Charm Saree Pin",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-26",
-    "name": "Rangilo Ruby Kutchi Flair",
-    "price": 700,
-    "deposit": 2500
+    "name": "Oxidised Black Stone Necklace",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-27",
-    "name": "Vrindavan Floral Silk Choli",
-    "price": 700,
-    "deposit": 2200
+    "name": "Metallic Silver Bangle Set",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-28",
-    "name": "Surya Kiran Golden Mustard",
-    "price": 700,
-    "deposit": 2300
+    "name": "Floral Oxidised Silver Jhumkas",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-29",
-    "name": "Meenakari Emerald Green Set",
-    "price": 700,
-    "deposit": 2500
+    "name": "Multicolor Beaded Oxidised Necklace",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-30",
-    "name": "Parijaat Blossom Pink Chaniya",
-    "price": 700,
-    "deposit": 2100
+    "name": "Diamond Studded Oxidised Earrings",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-31",
-    "name": "Shyamali Royal Indigo Set",
-    "price": 700,
-    "deposit": 2400
+    "name": "Mandala Round Oxidised Jhumkas",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-32",
-    "name": "Manikya Scarlet Zari Lehanga",
-    "price": 700,
-    "deposit": 2500
+    "name": "Cone Bell Oxidised Earrings",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-33",
-    "name": "Amrapali Festive Multicolour",
-    "price": 700,
-    "deposit": 2300
+    "name": "Butterfly Chain Drop Earrings",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-34",
-    "name": "Dharani Earthy Terracotta Set",
-    "price": 700,
-    "deposit": 2200
+    "name": "Floral Ring Oxidised Jhumkas",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-35",
-    "name": "Neelambari Turquoise Flair",
-    "price": 700,
-    "deposit": 2400
+    "name": "Dancing Doll Oxidised Earrings",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-36",
-    "name": "Sonpari Yellow Abhala Ghagra",
-    "price": 700,
-    "deposit": 2200
+    "name": "Floral Ghungroo Oxidised Kada",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-37",
-    "name": "Kasturi Lavender Silk Set",
-    "price": 700,
-    "deposit": 2300
+    "name": "Beaded Jhumka Bangles",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-38",
-    "name": "Rudrani Wine Velvet Gher",
-    "price": 700,
-    "deposit": 2500
+    "name": "Pearl Chain Dome Jhumkas",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-39",
-    "name": "Shringaar Coral Bandhej Set",
-    "price": 700,
-    "deposit": 2200
+    "name": "Layered Bell Oxidised Necklace",
+    "price": 50,
+    "deposit": 50
   },
   {
     "id": "gfit-40",
-    "name": "Devyani Sapphire Embroidered",
-    "price": 700,
-    "deposit": 2400
+    "name": "Vintage Charm Hanging Brooch",
+    "price": 50,
+    "deposit": 50
   }
 ]
