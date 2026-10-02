@@ -1120,6 +1120,7 @@
 
 /* Responsive queries for in-page slide panels (About & Contact) */
 @media (max-width: 900px) {
+
   .about-slide-container,
   .contact-slide-container {
     grid-template-columns: 1fr;
@@ -1143,6 +1144,7 @@
 }
 
 @media (max-width: 580px) {
+
   .about-slide-container,
   .contact-slide-container {
     padding: 14px 12px 40px;
@@ -1648,15 +1650,24 @@
 }
 
 @media (max-width: 600px) {
+  .modal-stepper-bar .stepper-label {
+    display: none;
+  }
+
   .step1-checkout-layout {
     grid-template-columns: 1fr;
     gap: 8px;
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 800px) {
   .step-date-split-layout {
     grid-template-columns: 1fr;
+  }
+
+  .step-date-product-left,
+  .product-previews-stack {
+    display: none;
   }
 
   .product-left-img-wrap {
