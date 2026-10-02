@@ -84,7 +84,10 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
   // OTP Verification state
   const [otpSent, setOtpSent] = useState(false);
   const [otpVerified, setOtpVerified] = useState(false);
+  const [enteredOtp, setEnteredOtp] = useState('');
   const [otpError, setOtpError] = useState('');
+  const [otpSuccessMsg, setOtpSuccessMsg] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
 
   // Calendar view state (Current month & year)
   const today = new Date();
@@ -212,52 +215,183 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
       .join(', ');
   };
 
-  // MSG91 Widget Configuration
+  // MSG91 Widget Configuration (Expose Methods Inline)
   const MSG91_WIDGET_ID = '3669736e7549313132323936';
   const MSG91_TOKEN_AUTH = '573012TojnW870c3i6aae9b10P1';
 
-  // Load MSG91 OTP SDK Script dynamically
+  // Load MSG91 OTP SDK Script dynamically with exposeMethods: true
   useEffect(() => {
-    if (typeof window !== 'undefined' && !document.getElementById('msg91-otp-sdk')) {
-      const script = document.createElement('script');
-      script.id = 'msg91-otp-sdk';
-      script.src = 'https://verify.msg91.com/otp-provider.js';
-      script.async = true;
-      script.onload = () => {
-        console.log('[MSG91 SDK] Loaded successfully for OTP verification');
-      };
-      document.body.appendChild(script);
+    const initWidget = () => {
+      if (typeof window !== 'undefined' && typeof window.initSendOTP === 'function') {
+        window.initSendOTP({
+          widgetId: MSG91_WIDGET_ID,
+          tokenAuth: MSG91_TOKEN_AUTH,
+          exposeMethods: true,
+          success: (data) => {
+            console.log('[MSG91 Global Success]', data);
+          },
+          failure: (err) => {
+            console.warn('[MSG91 Global Notice]', err);
+          }
+        });
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      if (!document.getElementById('msg91-otp-sdk')) {
+        const script = document.createElement('script');
+        script.id = 'msg91-otp-sdk';
+        script.src = 'https://verify.msg91.com/otp-provider.js';
+        script.async = true;
+        script.onload = () => {
+          console.log('[MSG91 SDK] Loaded successfully with exposeMethods: true');
+          initWidget();
+        };
+        document.body.appendChild(script);
+      } else {
+        initWidget();
+      }
     }
   }, []);
 
-  // Trigger MSG91 OTP Verification Popup
-  const handleTriggerOtpPopup = () => {
+  // Resend Countdown Timer
+  useEffect(() => {
+    let interval = null;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
+  // Send OTP to Mobile using MSG91 exposed method
+  const handleSendOtp = () => {
     const rawMobile = formData.mobile.replace(/\D/g, '');
     if (!rawMobile || rawMobile.length < 10) {
       setOtpError('Please enter a valid 10-digit mobile number first');
       return;
     }
     setOtpError('');
+    setOtpSuccessMsg('');
+    setIsSendingOtp(true);
     const cleanPhone = rawMobile.slice(-10);
     const formattedMobile = `91${cleanPhone}`;
 
-    if (typeof window !== 'undefined' && typeof window.initSendOTP === 'function') {
-      window.initSendOTP({
-        widgetId: MSG91_WIDGET_ID,
-        tokenAuth: MSG91_TOKEN_AUTH,
-        identifier: formattedMobile,
-        success: (data) => {
-          console.log('[MSG91 Verified Successfully]', data);
+    if (typeof window !== 'undefined' && typeof window.sendOtp === 'function') {
+      window.sendOtp(
+        formattedMobile,
+        (data) => {
+          console.log('[MSG91 OTP Sent]', data);
+          setIsSendingOtp(false);
+          setOtpSent(true);
+          setOtpSuccessMsg(`OTP sent to +91 ${cleanPhone}`);
+          setResendTimer(30);
+        },
+        (error) => {
+          console.error('[MSG91 Send OTP Error]', error);
+          setIsSendingOtp(false);
+          const msg = (typeof error === 'string' ? error : error?.message) || 'Failed to send OTP. Please check mobile number.';
+          setOtpError(msg);
+        }
+      );
+    } else {
+      // Re-initialize widget if needed
+      if (typeof window !== 'undefined' && typeof window.initSendOTP === 'function') {
+        window.initSendOTP({
+          widgetId: MSG91_WIDGET_ID,
+          tokenAuth: MSG91_TOKEN_AUTH,
+          exposeMethods: true,
+          success: () => { },
+          failure: () => { }
+        });
+        setTimeout(() => {
+          if (typeof window.sendOtp === 'function') {
+            window.sendOtp(
+              formattedMobile,
+              (data) => {
+                setIsSendingOtp(false);
+                setOtpSent(true);
+                setOtpSuccessMsg(`OTP sent to +91 ${cleanPhone}`);
+                setResendTimer(30);
+              },
+              (err) => {
+                setIsSendingOtp(false);
+                setOtpError(err?.message || 'Failed to send OTP.');
+              }
+            );
+          } else {
+            setIsSendingOtp(false);
+            setOtpSent(true);
+            setOtpSuccessMsg('Demo OTP mode: Enter any 4-6 digit code to verify');
+          }
+        }, 500);
+      } else {
+        setIsSendingOtp(false);
+        setOtpSent(true);
+        setOtpSuccessMsg('Demo OTP mode: Enter any 4-6 digit code to verify');
+      }
+    }
+  };
+
+  // Verify OTP entered by user
+  const handleVerifyOtp = () => {
+    if (!enteredOtp || enteredOtp.trim().length < 4) {
+      setOtpError('Invalid OTP');
+      return;
+    }
+    setOtpError('');
+    setIsVerifyingOtp(true);
+
+    if (typeof window !== 'undefined' && typeof window.verifyOtp === 'function') {
+      window.verifyOtp(
+        enteredOtp.trim(),
+        (data) => {
+          console.log('[MSG91 OTP Verified]', data);
+          setIsVerifyingOtp(false);
           setOtpVerified(true);
           setOtpError('');
+          setOtpSuccessMsg('Mobile number verified! ✓');
         },
-        failure: (err) => {
-          console.warn('[MSG91 Popup Notice]', err);
+        (error) => {
+          console.error('[MSG91 Verify Error]', error);
+          setIsVerifyingOtp(false);
+          setOtpError('Invalid OTP');
         }
-      });
+      );
     } else {
-      console.warn('MSG91 SDK initializing, verified for demo');
-      setOtpVerified(true);
+      setTimeout(() => {
+        setIsVerifyingOtp(false);
+        setOtpVerified(true);
+        setOtpSuccessMsg('Mobile number verified! ✓');
+      }, 400);
+    }
+  };
+
+  // Retry / Resend OTP via SMS or WhatsApp
+  const handleRetryOtp = (channel = null) => {
+    if (resendTimer > 0) return;
+    setOtpError('');
+    setOtpSuccessMsg('');
+    setIsSendingOtp(true);
+
+    if (typeof window !== 'undefined' && typeof window.retryOtp === 'function') {
+      window.retryOtp(
+        channel,
+        (data) => {
+          console.log('[MSG91 Retry Success]', data);
+          setIsSendingOtp(false);
+          setOtpSuccessMsg(`OTP resent via ${channel === '12' ? 'WhatsApp' : 'SMS'}!`);
+          setResendTimer(30);
+        },
+        (error) => {
+          console.error('[MSG91 Retry Error]', error);
+          setIsSendingOtp(false);
+          setOtpError(error?.message || 'Failed to resend OTP.');
+        }
+      );
+    } else {
+      handleSendOtp();
     }
   };
 
@@ -326,8 +460,10 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
     }
 
     if (!otpVerified) {
-      setOtpError('Please click "Verify OTP" to verify your mobile number before proceeding.');
-      handleTriggerOtpPopup();
+      setOtpError('Please verify your mobile number with the OTP code first.');
+      if (!otpSent) {
+        handleSendOtp();
+      }
       return;
     }
 
@@ -614,6 +750,7 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
                   </div>
 
                   {/* Mobile Number & OTP Verification */}
+                  {/* Mobile Number & Inline OTP Verification */}
                   <div className="form-field-group">
                     <label>Mobile Number *</label>
                     <div className="input-with-action">
@@ -624,31 +761,147 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
                         maxLength={10}
                         placeholder="Enter 10-digit mobile number"
                         value={formData.mobile}
+                        disabled={otpVerified}
                         onChange={(e) => {
-                          setFormData({ ...formData, mobile: e.target.value });
+                          setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '') });
                           setOtpVerified(false);
+                          setOtpSent(false);
+                          setEnteredOtp('');
+                          setOtpError('');
+                          setOtpSuccessMsg('');
                         }}
                       />
-                      {!otpVerified ? (
+                      {!otpVerified && !otpSent && (
                         <button
                           type="button"
                           className="btn-input-action"
-                          onClick={handleTriggerOtpPopup}
+                          disabled={isSendingOtp || !formData.mobile || formData.mobile.length < 10}
+                          onClick={handleSendOtp}
                         >
-                          Verify OTP
+                          {isSendingOtp ? 'Sending...' : 'Send OTP'}
                         </button>
-                      ) : (
+                      )}
+                      {otpVerified && (
                         <span className="verified-pill">
                           <CheckIcon size={14} /> Verified
                         </span>
                       )}
                     </div>
-                    {otpError && (
-                      <span className="otp-error-msg" style={{ marginTop: '4px', display: 'block', color: 'var(--color-burgundy)', fontSize: '0.82rem' }}>
+                    {!otpSent && otpError && (
+                      <span className="otp-error-msg" style={{ marginTop: '5px', display: 'block', color: 'var(--color-burgundy)', fontSize: '0.82rem', fontWeight: 500 }}>
                         {otpError}
                       </span>
                     )}
                   </div>
+
+                  {/* Inline OTP Input Box (No popup, purely in-form) */}
+                  {otpSent && !otpVerified && (
+                    <div className="form-field-group otp-inline-box" style={{ background: '#FFF9FA', border: '1.5px solid #F3C6D3', borderRadius: '12px', padding: '12px 14px', animation: 'fadeIn 0.25s ease' }}>
+                      <label style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-burgundy)', display: 'block', marginBottom: '6px' }}>
+                        Enter OTP
+                      </label>
+                      <div className="input-with-action" style={{ background: '#fff' }}>
+                        <input
+                          type="text"
+                          maxLength={4}
+                          placeholder="enter 4 digit otp"
+                          value={enteredOtp}
+                          onChange={(e) => {
+                            setEnteredOtp(e.target.value.replace(/\D/g, ''));
+                            setOtpError('');
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleVerifyOtp();
+                            }
+                          }}
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          className="btn-input-action"
+                          disabled={isVerifyingOtp || !enteredOtp || enteredOtp.length < 4}
+                          onClick={handleVerifyOtp}
+                          style={{ background: 'var(--color-rose)', color: '#FFFFFF' }}
+                        >
+                          {isVerifyingOtp ? 'Verifying...' : 'Verify OTP'}
+                        </button>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', gap: '8px', flexWrap: 'wrap' }}>
+                        <div>
+                          {otpError ? (
+                            <div style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '5px 12px',
+                              borderRadius: '8px',
+                              border: '1.5px solid #ef4444',
+                              background: '#FEF2F2',
+                              color: '#dc2626',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              boxShadow: '0 1px 2px rgba(239, 68, 68, 0.08)'
+                            }}>
+                              <span>{otpError}</span>
+                            </div>
+                          ) : otpSuccessMsg ? (
+                            <div style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '5px 12px',
+                              borderRadius: '8px',
+                              border: '1.5px solid #22c55e',
+                              background: '#F0FDF4',
+                              color: '#15803d',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              boxShadow: '0 1px 2px rgba(34, 197, 94, 0.08)'
+                            }}>
+                              <span>{otpSuccessMsg}</span>
+                            </div>
+                          ) : (
+                            <div style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '4px 10px',
+                              borderRadius: '6px',
+                              border: '1px solid #E5E7EB',
+                              background: '#F9FAFB',
+                              color: '#6B7280',
+                              fontSize: '0.78rem',
+                              fontWeight: 600
+                            }}>
+                              Enter 4-digit code from SMS
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <button
+                            type="button"
+                            disabled={resendTimer > 0 || isSendingOtp}
+                            onClick={() => handleRetryOtp('11')}
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '5px 12px',
+                              borderRadius: '8px',
+                              border: resendTimer > 0 ? '1.5px solid #E5E7EB' : '1.5px solid #F3C6D3',
+                              background: resendTimer > 0 ? '#F9FAFB' : '#FFF0F3',
+                              color: resendTimer > 0 ? '#9CA3AF' : 'var(--color-rose)',
+                              fontSize: '0.8rem',
+                              fontWeight: 700,
+                              cursor: resendTimer > 0 ? 'not-allowed' : 'pointer',
+                              boxShadow: resendTimer > 0 ? 'none' : '0 1px 2px rgba(195, 107, 126, 0.1)',
+                              transition: 'all 0.2s ease'
+                            }}
+                          >
+                            {resendTimer > 0 ? `Resend SMS (${resendTimer}s)` : 'Resend SMS'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Email (Unlocked only after OTP is verified) */}
                   <div className={`form-field-group ${!otpVerified ? 'field-locked' : ''}`}>
@@ -695,7 +948,7 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
                       className={`btn-primary step-btn-submit ${!otpVerified ? 'btn-disabled-locked' : ''}`}
                     >
                       {!otpVerified ? (
-                        <span>🔒 Verify Mobile to Continue</span>
+                        <span>Verify Mobile to Continue</span>
                       ) : (
                         <>
                           {paymentMethod === 'cod' && <span>Confirm COD Booking (₹{totalAmount.toLocaleString()})</span>}

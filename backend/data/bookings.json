@@ -1,6 +1,29 @@
 {
   "bookings": [
     {
+      "id": "GB-961737",
+      "outfitId": "gfit-02",
+      "outfitName": "Sunkissed Marigold Rabari",
+      "customerName": "krishna gorde",
+      "firstName": "krishna",
+      "lastName": "gorde",
+      "email": "krishnagorde04@gfmail.com",
+      "phone": "9404527706",
+      "mobile": "9404527706",
+      "deliveryLocation": "pune",
+      "location": "pune",
+      "selectedDates": [
+        "2026-10-22"
+      ],
+      "rentalNights": 1,
+      "size": "M",
+      "paymentMethod": "cod",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "status": "Confirmed",
+      "createdAt": "2026-10-02T07:09:21.737Z"
+    },
+    {
       "id": "GB-403344",
       "outfitId": "gfit-03",
       "outfitName": "Magenta Rani Bandhani",
