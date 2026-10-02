@@ -542,6 +542,7 @@
 }
 
 .btn-card-view,
+.btn-card-trial,
 .btn-card-rent {
   flex: 1;
   display: inline-flex;
@@ -555,6 +556,22 @@
   cursor: pointer;
   box-sizing: border-box;
   transition: all 0.25s ease;
+}
+
+.btn-card-trial {
+  border: 1.5px solid #25D366;
+  background: #F0FDF4;
+  color: #128C7E;
+  padding: 10px 0;
+  height: 40px;
+}
+
+.btn-card-trial:hover {
+  background: #25D366;
+  color: #FFFFFF;
+  border-color: #25D366;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
 }
 
 .btn-card-view {

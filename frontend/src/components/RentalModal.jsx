@@ -639,7 +639,7 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
                             disabled={selectedDates.length === 0}
                             onClick={() => goToStep(2, 'next')}
                           >
-                            <span>Pay / Proceed</span>
+                            <span>Proceed</span>
                             <ArrowRightIcon size={16} />
                           </button>
                         </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { BrowseRentIcon, EyeIcon, ArrowRightIcon, StarIcon, CloseIcon, SparkleIcon, ShieldCheckIcon, ChevronLeftIcon, ChevronRightIcon, LinkedInIcon, GitHubIcon, MailIcon, PhoneIcon } from '../components/Icons';
+import { BrowseRentIcon, WhatsAppIcon, ArrowRightIcon, StarIcon, CloseIcon, SparkleIcon, ShieldCheckIcon, ChevronLeftIcon, ChevronRightIcon, LinkedInIcon, GitHubIcon, MailIcon, PhoneIcon } from '../components/Icons';
 import RentalModal from '../components/RentalModal';
 import OUTFITS from '../../../backend/data/products.json';
 import '../styles/style-home.css';
@@ -27,7 +27,7 @@ const getOutfitImages = (outfit) => {
 };
 
 /* ── Outfit Card Component: Image Carousel with GSAP Slide, Price tag + two buttons below ── */
-const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
+const OutfitCardItem = React.forwardRef(({ outfit, onRent }, ref) => {
   const images = getOutfitImages(outfit);
   const [currentIdx, setCurrentIdx] = useState(0);
   const trackRef = useRef(null);
@@ -55,6 +55,14 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
   const handleDotClick = (e, idx) => {
     e.stopPropagation();
     setCurrentIdx(idx);
+  };
+
+  const handleWhatsAppTrial = (e) => {
+    e.stopPropagation();
+    const phone = '916354793852';
+    const message = `Hi, i want to book a trial for ${outfit.name}`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -134,12 +142,12 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
       <div className="card-minimal-footer">
         <button
           type="button"
-          className="btn-card-view"
-          onClick={() => onView(outfit)}
-          title="View outfit details"
+          className="btn-card-trial"
+          onClick={handleWhatsAppTrial}
+          title={`Book a trial on WhatsApp for ${outfit.name}`}
         >
-          <EyeIcon size={16} />
-          <span>View</span>
+          <WhatsAppIcon size={16} />
+          <span>Book Trial</span>
         </button>
         <button
           type="button"
@@ -566,10 +574,6 @@ export default function Home({
               outfit={outfit}
               ref={(el) => (cardRefs.current[index] = el)}
               onRent={(item) => handleOpenRentModal(item)}
-              onView={(item) => {
-                setModalImgIndex(0);
-                setViewModalOutfit(item);
-              }}
             />
           ))}
         </div>
