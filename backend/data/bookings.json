@@ -1,6 +1,98 @@
 {
   "bookings": [
     {
+      "id": "GB-665837",
+      "outfitId": "gfit-02",
+      "outfitName": "Sunkissed Marigold Rabari",
+      "customerName": "genda floor cleaner",
+      "firstName": "genda",
+      "lastName": "floor cleaner",
+      "email": "4krishnagorde04@gmail.com",
+      "phone": "9404527706",
+      "mobile": "9404527706",
+      "deliveryLocation": "samurai",
+      "location": "samurai",
+      "selectedDates": [
+        "2026-10-14"
+      ],
+      "rentalNights": 1,
+      "size": "M",
+      "paymentMethod": "trial",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "status": "Confirmed",
+      "createdAt": "2026-10-02T17:54:25.837Z"
+    },
+    {
+      "id": "GB-513970",
+      "outfitId": "gfit-03",
+      "outfitName": "Magenta Rani Bandhani",
+      "customerName": "p o",
+      "firstName": "p",
+      "lastName": "o",
+      "email": "4krishnagorde@gmail.com",
+      "phone": "9404527706",
+      "mobile": "9404527706",
+      "deliveryLocation": "pune",
+      "location": "pune",
+      "selectedDates": [
+        "2026-10-15"
+      ],
+      "rentalNights": 1,
+      "size": "M",
+      "paymentMethod": "trial",
+      "totalRent": 500,
+      "refundableDeposit": 500,
+      "status": "Confirmed",
+      "createdAt": "2026-10-02T17:35:13.970Z"
+    },
+    {
+      "id": "GB-158612",
+      "outfitId": "gfit-01",
+      "outfitName": "P",
+      "customerName": "a train",
+      "firstName": "a",
+      "lastName": "train",
+      "email": "1krishnagorde@gmail.com",
+      "phone": "9404527706",
+      "mobile": "9404527706",
+      "deliveryLocation": "pune",
+      "location": "pune",
+      "selectedDates": [
+        "2026-10-14"
+      ],
+      "rentalNights": 1,
+      "size": "M",
+      "paymentMethod": "trial",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "status": "Confirmed",
+      "createdAt": "2026-10-02T17:29:18.612Z"
+    },
+    {
+      "id": "GB-677748",
+      "outfitId": "gfit-01",
+      "outfitName": "P",
+      "customerName": "s s",
+      "firstName": "s",
+      "lastName": "s",
+      "email": "krihna@gmail.com",
+      "phone": "9404527706",
+      "mobile": "9404527706",
+      "deliveryLocation": "123",
+      "location": "123",
+      "selectedDates": [
+        "2026-10-22"
+      ],
+      "rentalNights": 1,
+      "size": "M",
+      "paymentMethod": "cod",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "status": "Confirmed",
+      "createdAt": "2026-10-02T17:04:37.748Z"
+    },
+    {
       "id": "GB-961737",
       "outfitId": "gfit-02",
       "outfitName": "Sunkissed Marigold Rabari",

@@ -74,14 +74,14 @@
   {
     "id": "gfit-13",
     "name": "Teal Mayura Gamthi",
-    "price": 100,
-    "deposit": 100
+    "price": 700,
+    "deposit": 700
   },
   {
     "id": "gfit-14",
     "name": "Lavender Pastel Mirror",
-    "price": 100,
-    "deposit": 100
+    "price": 500,
+    "deposit": 500
   },
   {
     "id": "gfit-15",
@@ -118,5 +118,125 @@
     "name": "Turquoise Bandhani Set",
     "price": 100,
     "deposit": 100
+  },
+  {
+    "id": "gfit-21",
+    "name": "Navrang Royal Chaniya Set",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-22",
+    "name": "Radha Rani Festive Ghagra",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-23",
+    "name": "Morpankhi Deep Blue Gamthi",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-24",
+    "name": "Kesar Kasturi Embroidered Ghagra",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-25",
+    "name": "Chandrakala Silver Mirrorwork",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-26",
+    "name": "Rangilo Ruby Kutchi Flair",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-27",
+    "name": "Vrindavan Floral Silk Choli",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-28",
+    "name": "Surya Kiran Golden Mustard",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-29",
+    "name": "Meenakari Emerald Green Set",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-30",
+    "name": "Parijaat Blossom Pink Chaniya",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-31",
+    "name": "Shyamali Royal Indigo Set",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-32",
+    "name": "Manikya Scarlet Zari Lehanga",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-33",
+    "name": "Amrapali Festive Multicolour",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-34",
+    "name": "Dharani Earthy Terracotta Set",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-35",
+    "name": "Neelambari Turquoise Flair",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-36",
+    "name": "Sonpari Yellow Abhala Ghagra",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-37",
+    "name": "Kasturi Lavender Silk Set",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-38",
+    "name": "Rudrani Wine Velvet Gher",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-39",
+    "name": "Shringaar Coral Bandhej Set",
+    "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-40",
+    "name": "Devyani Sapphire Embroidered",
+    "price": 50,
+    "deposit": 50
   }
 ]
