@@ -22,8 +22,13 @@ export default function OutfitCard({ outfit, onRentClick }) {
           src={images[currentIdx]}
           alt={`${outfit.name} - view ${currentIdx + 1}`}
           loading="lazy"
+          decoding="async"
           onError={(e) => {
-            e.currentTarget.src = outfit.image || '/assets/2.png';
+            if (e.currentTarget.src.endsWith('.webp')) {
+              e.currentTarget.src = e.currentTarget.src.replace('.webp', '.png');
+            } else {
+              e.currentTarget.src = outfit.image || '/assets/outfits/p1a.webp';
+            }
           }}
         />
         {images.length > 1 && (

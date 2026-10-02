@@ -11,8 +11,11 @@ export default function Contact() {
           <div className="contact-phone-col">
             <div className="contact-phone-frame">
               <img
-                src="/assets/contact-phone.jpg"
+                src="/assets/contact-phone.webp"
                 alt="Retro Hello Phone"
+                loading="lazy"
+                decoding="async"
+                onError={(e) => { e.currentTarget.src = '/assets/contact-phone.jpg'; }}
               />
             </div>
           </div>

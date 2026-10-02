@@ -311,11 +311,19 @@
   width: 100%;
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  background: #FDF4F5;
+  background: linear-gradient(110deg, #FBF0F2 8%, #FDF6F7 18%, #FBF0F2 33%);
+  background-size: 200% 100%;
+  animation: 1.5s cardShimmer linear infinite;
   border-radius: 18px 18px 0 0;
   display: block;
   box-sizing: border-box;
   flex-shrink: 0;
+}
+
+@keyframes cardShimmer {
+  to {
+    background-position-x: -200%;
+  }
 }
 
 .card-slider-track {
