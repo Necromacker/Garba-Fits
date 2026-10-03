@@ -18,7 +18,7 @@ const getOutfitImages = (outfit) => {
   if (outfit.images && outfit.images.length > 0) return outfit.images;
   if (outfit.image) return [outfit.image];
   const num = parseInt(outfit.id?.replace(/\D/g, '') || '1', 10);
-  return num <= 12
+  return num <= 14
     ? [`/assets/outfits/p${num}a.webp`, `/assets/outfits/p${num}b.webp`]
     : [`/assets/outfits/p${num}a.webp`];
 };
@@ -522,22 +522,28 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
                   {/* Left Column: Both Preview Images Stacked Vertically */}
                   <div className="step-date-product-left">
                     <div className="product-previews-stack">
-                      {getOutfitImages(outfit).map((imgSrc, idx) => (
-                        <div key={idx} className="product-preview-card">
-                          <img
-                            src={imgSrc}
-                            alt={`${outfit.name} view ${idx + 1}`}
-                            decoding="async"
-                            onError={(e) => {
-                              if (e.currentTarget.src.endsWith('.webp')) {
-                                e.currentTarget.src = e.currentTarget.src.replace('.webp', '.png');
-                              } else {
-                                e.currentTarget.src = '/assets/outfits/p1a.webp';
-                              }
-                            }}
-                          />
-                        </div>
-                      ))}
+                      {getOutfitImages(outfit).map((imgSrc, idx) => {
+                        const rNum = parseInt(outfit?.id?.replace(/\D/g, '') || '1', 10);
+                        const isRCover = rNum >= 23 && rNum <= 41;
+                        return (
+                          <div key={idx} className="product-preview-card">
+                            <img
+                              src={imgSrc}
+                              alt={`${outfit.name} view ${idx + 1}`}
+                              className={isRCover ? "img-cover-fit" : ""}
+                              style={isRCover ? { objectFit: 'cover', objectPosition: 'center top' } : {}}
+                              decoding="async"
+                              onError={(e) => {
+                                if (e.currentTarget.src.endsWith('.webp')) {
+                                  e.currentTarget.src = e.currentTarget.src.replace('.webp', '.png');
+                                } else {
+                                  e.currentTarget.src = '/assets/outfits/p1a.webp';
+                                }
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -639,7 +645,7 @@ export default function RentalModal({ outfit, onClose, onNavigateTab }) {
                             disabled={selectedDates.length === 0}
                             onClick={() => goToStep(2, 'next')}
                           >
-                            <span>Pay / Proceed</span>
+                            <span>Proceed</span>
                             <ArrowRightIcon size={16} />
                           </button>
                         </div>

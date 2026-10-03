@@ -224,7 +224,7 @@ app.post(['/api/logs/rent-click', '/api/logs/click-rent', '/api/analytics/rent-c
   console.log(`🛒 [RENT CLICKED] User opened rental for:`);
   console.log(`👗 Name:    ${outfitName || 'Unknown Product'}`);
   console.log(`🆔 ID:      ${outfitId || 'N/A'}`);
-  if (price !== undefined)   console.log(`💰 Rent:    ₹${price}`);
+  if (price !== undefined) console.log(`💰 Rent:    ₹${price}`);
   if (deposit !== undefined) console.log(`🛡️ Deposit: ₹${deposit}`);
   console.log(`⏰ Time:    ${timestamp}`);
   console.log(`======================================================\n`);
@@ -266,26 +266,30 @@ app.post('/api/rentals', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Missing outfit or contact details' });
   }
 
+  const formatReadableTime = (d = new Date()) => {
+    return new Date(d).toLocaleString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
   const booking = {
-    id: `GB-${Date.now().toString().slice(-6)}`,
+    id: `GB-${Math.floor(100000 + Math.random() * 900000)}`,
     outfitId,
     outfitName: outfit ? outfit.name : 'Custom Garba Fit',
     customerName: clientName,
-    firstName: firstName || '',
-    lastName: lastName || '',
     email: email || '',
     phone: clientPhone,
-    mobile: clientPhone,
     deliveryLocation: location || city || 'Ahmedabad',
-    location: location || city || 'Ahmedabad',
-    selectedDates: selectedDates || [startDate || new Date().toISOString().split('T')[0]],
-    rentalNights,
-    size: size || 'M',
-    paymentMethod: paymentMethod || 'cod',
+    selectedDates: Array.isArray(selectedDates) ? selectedDates : [startDate || new Date().toISOString().split('T')[0]],
+    paymentMethod: paymentMethod || 'trial',
     totalRent: rent,
     refundableDeposit: deposit,
-    status: 'Confirmed',
-    createdAt: new Date().toISOString()
+    time: formatReadableTime()
   };
 
   // Save to MongoDB Atlas (and local backup)

@@ -66,7 +66,7 @@ export const db = {
   getBookings: async () => {
     try {
       if (mongoose.connection.readyState === 1) {
-        const docs = await Booking.find().sort({ createdAt: -1 }).lean();
+        const docs = await Booking.find({}, { _id: 0, __v: 0 }).sort({ _id: -1 }).lean();
         return docs;
       }
     } catch (err) {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { BrowseRentIcon, EyeIcon, ArrowRightIcon, StarIcon, CloseIcon, SparkleIcon, ShieldCheckIcon, ChevronLeftIcon, ChevronRightIcon, LinkedInIcon, GitHubIcon, MailIcon, PhoneIcon } from '../components/Icons';
+import { BrowseRentIcon, WhatsAppIcon, ArrowRightIcon, StarIcon, CloseIcon, SparkleIcon, ShieldCheckIcon, ChevronLeftIcon, ChevronRightIcon, LinkedInIcon, GitHubIcon, MailIcon, PhoneIcon } from '../components/Icons';
 import RentalModal from '../components/RentalModal';
 import OUTFITS from '../../../backend/data/products.json';
 import '../styles/style-home.css';
@@ -21,13 +21,13 @@ const getOutfitImages = (outfit) => {
   if (outfit.images && outfit.images.length > 0) return outfit.images;
   if (outfit.image) return [outfit.image];
   const num = parseInt(outfit.id?.replace(/\D/g, '') || '1', 10);
-  return num <= 12
+  return num <= 14
     ? [`/assets/outfits/p${num}a.webp`, `/assets/outfits/p${num}b.webp`]
     : [`/assets/outfits/p${num}a.webp`];
 };
 
 /* ── Outfit Card Component: Image Carousel with GSAP Slide, Price tag + two buttons below ── */
-const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
+const OutfitCardItem = React.forwardRef(({ outfit, onRent }, ref) => {
   const images = getOutfitImages(outfit);
   const [currentIdx, setCurrentIdx] = useState(0);
   const trackRef = useRef(null);
@@ -57,6 +57,14 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
     setCurrentIdx(idx);
   };
 
+  const handleWhatsAppTrial = (e) => {
+    e.stopPropagation();
+    const phone = '916354793852';
+    const message = `Hi, i want to book a trial for ${outfit.name}`;
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <div className="hero-outfit-card" ref={ref}>
       <div className="card-media-wrap">
@@ -74,6 +82,8 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
               <img
                 src={imgSrc}
                 alt={`${outfit.name} - view ${idx + 1}`}
+                className={parseInt(outfit.id?.replace(/\D/g, '') || '1', 10) >= 23 ? "img-cover-fit" : ""}
+                style={parseInt(outfit.id?.replace(/\D/g, '') || '1', 10) >= 23 ? { objectFit: 'cover', objectPosition: 'center top' } : {}}
                 loading={idx === 0 ? "eager" : "lazy"}
                 decoding="async"
                 onError={(e) => {
@@ -88,10 +98,17 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
           ))}
         </div>
 
-        {/* Translucent Price tag on top left of image */}
+        {/* Price tag - top left */}
         <span className="card-price-tag">
           ₹ {outfit.price ?? outfit.pricePerNight ?? 700} / Night
         </span>
+
+        {/* Free Jewellery tag - top right */}
+        {Number(outfit.price ?? outfit.pricePerNight) === 900 && (
+          <span className="card-jewellery-tag">
+            Free Jewellery
+          </span>
+        )}
 
         {/* Carousel Prev/Next Arrows */}
         {images.length > 1 && (
@@ -134,12 +151,12 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent, onView }, ref) => {
       <div className="card-minimal-footer">
         <button
           type="button"
-          className="btn-card-view"
-          onClick={() => onView(outfit)}
-          title="View outfit details"
+          className="btn-card-trial"
+          onClick={handleWhatsAppTrial}
+          title={`Book a trial on WhatsApp for ${outfit.name}`}
         >
-          <EyeIcon size={16} />
-          <span>View</span>
+          <WhatsAppIcon size={16} />
+          <span>Book Trial</span>
         </button>
         <button
           type="button"
@@ -184,7 +201,7 @@ export default function Home({
           price: item.price || item.rentPrice,
           deposit: item.deposit
         })
-      }).catch(() => {});
+      }).catch(() => { });
     }
   };
 
@@ -566,10 +583,6 @@ export default function Home({
               outfit={outfit}
               ref={(el) => (cardRefs.current[index] = el)}
               onRent={(item) => handleOpenRentModal(item)}
-              onView={(item) => {
-                setModalImgIndex(0);
-                setViewModalOutfit(item);
-              }}
             />
           ))}
         </div>
@@ -581,7 +594,7 @@ export default function Home({
             <div className="about-vector-left">
               <h2 className="about-big-heading">ABOUT US</h2>
               <div className="about-heading-bar"></div>
-              
+
               <p className="about-vector-desc">
                 We are 3rd year B.Tech CSE students from MIT ADT University developing <strong>GarbaFits</strong>, a platform to rent authentic designer Chaniya Cholis and festive fits for Garba, Dandiya, and cultural celebrations.
               </p>
@@ -782,22 +795,28 @@ export default function Home({
 
             {/* Top: Both preview images side by side in separate divs */}
             <div className="preview-modal-images-top">
-              {getOutfitImages(viewModalOutfit).map((imgSrc, idx) => (
-                <div key={idx} className="preview-modal-single-img-card">
-                  <img
-                    src={imgSrc}
-                    alt={`${viewModalOutfit.name} view ${idx + 1}`}
-                    decoding="async"
-                    onError={(e) => {
-                      if (e.currentTarget.src.endsWith('.webp')) {
-                        e.currentTarget.src = e.currentTarget.src.replace('.webp', '.png');
-                      } else {
-                        e.currentTarget.src = '/assets/outfits/p1a.webp';
-                      }
-                    }}
-                  />
-                </div>
-              ))}
+              {getOutfitImages(viewModalOutfit).map((imgSrc, idx) => {
+                const vNum = parseInt(viewModalOutfit.id?.replace(/\D/g, '') || '1', 10);
+                const isVCover = vNum >= 23 && vNum <= 41;
+                return (
+                  <div key={idx} className="preview-modal-single-img-card">
+                    <img
+                      src={imgSrc}
+                      alt={`${viewModalOutfit.name} view ${idx + 1}`}
+                      className={isVCover ? "img-cover-fit" : ""}
+                      style={isVCover ? { objectFit: 'cover', objectPosition: 'center top' } : {}}
+                      decoding="async"
+                      onError={(e) => {
+                        if (e.currentTarget.src.endsWith('.webp')) {
+                          e.currentTarget.src = e.currentTarget.src.replace('.webp', '.png');
+                        } else {
+                          e.currentTarget.src = '/assets/outfits/p1a.webp';
+                        }
+                      }}
+                    />
+                  </div>
+                );
+              })}
             </div>
 
             {/* Bottom: Contact Us and Rent It buttons */}

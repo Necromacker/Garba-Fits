@@ -361,11 +361,21 @@
   filter: none;
 }
 
-/* ── Translucent Price tag on top left of image with margin ── */
+.card-slider-slide img.img-cover-fit,
+.card-media-wrap img.img-cover-fit,
+.preview-modal-single-img-card img.img-cover-fit,
+.product-preview-card img.img-cover-fit {
+  object-fit: cover !important;
+  object-position: center top !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Translucent Price tag - top left ── */
 .card-price-tag {
   position: absolute;
-  top: 14px;
-  left: 14px;
+  top: clamp(4px, 1.2vw, 10px);
+  left: clamp(4px, 1.2vw, 10px);
   background: rgba(43, 53, 65, 0.65);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -374,12 +384,38 @@
   border-radius: var(--radius-pill);
   font-size: 0.92rem;
   font-weight: 700;
-  letter-spacing: 0.3px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 3px;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+/* ── Free Jewellery Tag - top right ── */
+.card-jewellery-tag {
+  position: absolute;
+  top: clamp(4px, 1.2vw, 10px);
+  right: clamp(4px, 1.2vw, 10px);
+  background: rgba(43, 53, 65, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #FFE082;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.90rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(255, 224, 130, 0.4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  box-sizing: border-box;
   z-index: 2;
 }
 
@@ -542,6 +578,7 @@
 }
 
 .btn-card-view,
+.btn-card-trial,
 .btn-card-rent {
   flex: 1;
   display: inline-flex;
@@ -555,6 +592,22 @@
   cursor: pointer;
   box-sizing: border-box;
   transition: all 0.25s ease;
+}
+
+.btn-card-trial {
+  border: 1.5px solid #25D366;
+  background: #F0FDF4;
+  color: #128C7E;
+  padding: 10px 0;
+  height: 40px;
+}
+
+.btn-card-trial:hover {
+  background: #25D366;
+  color: #FFFFFF;
+  border-color: #25D366;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
 }
 
 .btn-card-view {
@@ -1120,6 +1173,7 @@
 
 /* Responsive queries for in-page slide panels (About & Contact) */
 @media (max-width: 900px) {
+
   .about-slide-container,
   .contact-slide-container {
     grid-template-columns: 1fr;
@@ -1143,6 +1197,7 @@
 }
 
 @media (max-width: 580px) {
+
   .about-slide-container,
   .contact-slide-container {
     padding: 14px 12px 40px;
@@ -1648,15 +1703,24 @@
 }
 
 @media (max-width: 600px) {
+  .modal-stepper-bar .stepper-label {
+    display: none;
+  }
+
   .step1-checkout-layout {
     grid-template-columns: 1fr;
     gap: 8px;
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 800px) {
   .step-date-split-layout {
     grid-template-columns: 1fr;
+  }
+
+  .step-date-product-left,
+  .product-previews-stack {
+    display: none;
   }
 
   .product-left-img-wrap {

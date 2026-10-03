@@ -1,242 +1,266 @@
 {
   "bookings": [
     {
-      "id": "GB-961737",
+      "id": "GB-478204",
       "outfitId": "gfit-02",
-      "outfitName": "Sunkissed Marigold Rabari",
-      "customerName": "krishna gorde",
-      "firstName": "krishna",
-      "lastName": "gorde",
-      "email": "krishnagorde04@gfmail.com",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "kr ish",
+      "email": "4krishnagorde04@gmail.com",
       "phone": "9404527706",
-      "mobile": "9404527706",
-      "deliveryLocation": "pune",
-      "location": "pune",
+      "deliveryLocation": "pune , surat",
+      "selectedDates": [
+        "2026-10-06",
+        "2026-10-07"
+      ],
+      "paymentMethod": "cod",
+      "totalRent": 1800,
+      "refundableDeposit": 900,
+      "time": "Oct 03, 2026, 02:03 AM"
+    },
+    {
+      "id": "GB-665837",
+      "outfitId": "gfit-02",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "Genda Floor Cleaner",
+      "email": "4krishnagorde04@gmail.com",
+      "phone": "9404527706",
+      "deliveryLocation": "Samurai",
+      "selectedDates": [
+        "2026-10-14"
+      ],
+      "paymentMethod": "trial",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "time": "02 Oct 2026, 11:24 PM"
+    },
+    {
+      "id": "GB-513970",
+      "outfitId": "gfit-03",
+      "outfitName": "Charcoal Leheriya Chaniya",
+      "customerName": "P O",
+      "email": "4krishnagorde@gmail.com",
+      "phone": "9404527706",
+      "deliveryLocation": "Pune",
+      "selectedDates": [
+        "2026-10-15"
+      ],
+      "paymentMethod": "trial",
+      "totalRent": 500,
+      "refundableDeposit": 500,
+      "time": "02 Oct 2026, 11:05 PM"
+    },
+    {
+      "id": "GB-158612",
+      "outfitId": "gfit-01",
+      "outfitName": "Cherry Red Chaniya",
+      "customerName": "A Train",
+      "email": "1krishnagorde@gmail.com",
+      "phone": "9404527706",
+      "deliveryLocation": "Pune",
+      "selectedDates": [
+        "2026-10-14"
+      ],
+      "paymentMethod": "trial",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "time": "02 Oct 2026, 10:59 PM"
+    },
+    {
+      "id": "GB-677748",
+      "outfitId": "gfit-01",
+      "outfitName": "Cherry Red Chaniya",
+      "customerName": "S S",
+      "email": "krihna@gmail.com",
+      "phone": "9404527706",
+      "deliveryLocation": "Pune",
       "selectedDates": [
         "2026-10-22"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "cod",
       "totalRent": 900,
       "refundableDeposit": 900,
-      "status": "Confirmed",
-      "createdAt": "2026-10-02T07:09:21.737Z"
+      "time": "02 Oct 2026, 10:34 PM"
+    },
+    {
+      "id": "GB-961737",
+      "outfitId": "gfit-02",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "Krishna Gorde",
+      "email": "krishnagorde04@gmail.com",
+      "phone": "9404527706",
+      "deliveryLocation": "Pune",
+      "selectedDates": [
+        "2026-10-22"
+      ],
+      "paymentMethod": "cod",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "time": "02 Oct 2026, 12:39 PM"
     },
     {
       "id": "GB-403344",
       "outfitId": "gfit-03",
-      "outfitName": "Magenta Rani Bandhani",
-      "customerName": "vruti Moradiya",
-      "firstName": "vruti",
-      "lastName": "Moradiya",
+      "outfitName": "Charcoal Leheriya Chaniya",
+      "customerName": "Vruti Moradiya",
       "email": "vrutimoradiya999@gmail.com",
       "phone": "6354793852",
-      "mobile": "6354793852",
-      "deliveryLocation": "loni",
-      "location": "loni",
+      "deliveryLocation": "Loni",
       "selectedDates": [
         "2026-09-29"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 2790,
       "refundableDeposit": 2000,
-      "status": "Confirmed",
-      "createdAt": "2026-09-21T07:06:43.345Z"
+      "time": "21 Sep 2026, 12:36 PM"
     },
     {
       "id": "GB-436494",
       "outfitId": "gfit-02",
-      "outfitName": "Sunkissed Marigold Rabari",
-      "customerName": "vruti Moradiya",
-      "firstName": "vruti",
-      "lastName": "Moradiya",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "Vruti Moradiya",
       "email": "vrutimoradiya999@gmail.com",
       "phone": "6354793852",
-      "mobile": "6354793852",
-      "deliveryLocation": "loni",
-      "location": "loni",
+      "deliveryLocation": "Loni",
       "selectedDates": [
         "2026-09-20"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 2840,
       "refundableDeposit": 2500,
-      "status": "Confirmed",
-      "createdAt": "2026-09-20T11:07:16.494Z"
+      "time": "20 Sep 2026, 04:37 PM"
     },
     {
       "id": "GB-825452",
       "outfitId": "gfit-02",
-      "outfitName": "Sunkissed Marigold Rabari Ensemble",
-      "customerName": "vruti Moradiya",
-      "firstName": "vruti",
-      "lastName": "Moradiya",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "Vruti Moradiya",
       "email": "vrutimoradiya999@gmail.com",
       "phone": "6354793852",
-      "mobile": "6354793852",
-      "deliveryLocation": "mlkk",
-      "location": "mlkk",
+      "deliveryLocation": "Pune",
       "selectedDates": [
         "2026-09-20"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 700,
       "refundableDeposit": 2500,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T15:30:25.453Z"
+      "time": "19 Sep 2026, 09:00 PM"
     },
     {
       "id": "GB-378375",
       "outfitId": "gfit-02",
-      "outfitName": "Sunkissed Marigold Rabari Ensemble",
-      "customerName": "vruti Moradiya",
-      "firstName": "vruti",
-      "lastName": "Moradiya",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "Vruti Moradiya",
       "email": "vrutimoradiya999@gmail.com",
       "phone": "6354793852",
-      "mobile": "6354793852",
-      "deliveryLocation": "loni",
-      "location": "loni",
+      "deliveryLocation": "Loni",
       "selectedDates": [
         "2026-09-22"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 700,
       "refundableDeposit": 2500,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T15:22:58.375Z"
+      "time": "19 Sep 2026, 08:52 PM"
     },
     {
       "id": "GB-156511",
       "outfitId": "gfit-01",
-      "outfitName": "Royal Mirrorwork Peacock Chaniya Choli",
+      "outfitName": "Cherry Red Chaniya",
       "customerName": "Vruti Moradiya",
-      "firstName": "Vruti",
-      "lastName": "Moradiya",
       "email": "vrutimoradiya999@gmail.com",
       "phone": "6354793852",
-      "mobile": "6354793852",
       "deliveryLocation": "MIT ADT Campus, Pune",
-      "location": "MIT ADT Campus, Pune",
       "selectedDates": [
         "2026-10-18"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 700,
       "refundableDeposit": 2000,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T15:19:16.511Z"
+      "time": "19 Sep 2026, 08:49 PM"
     },
     {
       "id": "GB-704488",
       "outfitId": "gfit-02",
-      "outfitName": "Sunkissed Marigold Rabari Ensemble",
-      "customerName": "vruti Moradiya",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "Vruti Moradiya",
       "email": "vrutimoradiya999@gmail.com",
       "phone": "6354793852",
-      "deliveryLocation": "moti",
+      "deliveryLocation": "Pune",
       "selectedDates": [
         "2026-09-21"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 700,
       "refundableDeposit": 2500,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T14:38:24.488Z"
+      "time": "19 Sep 2026, 08:08 PM"
     },
     {
       "id": "GB-038685",
       "outfitId": "gfit-02",
-      "outfitName": "Sunkissed Marigold Rabari Ensemble",
-      "customerName": "reget ghhrg",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "Krishna Gorde",
       "email": "1krishnagorde04@gmail.com",
       "phone": "9404527706",
-      "deliveryLocation": "ghorpadi",
+      "deliveryLocation": "Ghorpadi",
       "selectedDates": [
         "2026-09-21"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 700,
       "refundableDeposit": 2500,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T09:43:58.685Z"
+      "time": "19 Sep 2026, 03:13 PM"
     },
     {
       "id": "GB-971124",
       "outfitId": "gfit-06",
-      "outfitName": "Sunset Amber Abhala Festive Chaniya",
-      "customerName": "Krishna  Gorde",
+      "outfitName": "Classic Black Mirrorwork Chaniya",
+      "customerName": "Krishna Gorde",
       "email": "krishnagorde04@gmail.com",
       "phone": "9404527706",
-      "deliveryLocation": "yahi pe ",
+      "deliveryLocation": "Pune",
       "selectedDates": [
         "2026-09-24"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 700,
       "refundableDeposit": 2400,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T09:09:31.124Z"
+      "time": "19 Sep 2026, 02:39 PM"
     },
     {
       "id": "GB-308145",
       "outfitId": "gfit-01",
-      "outfitName": "Royal Mirrorwork Peacock Chaniya Choli",
-      "customerName": "hv gc",
+      "outfitName": "Cherry Red Chaniya",
+      "customerName": "Harsh Vardhan",
       "email": "vh@gmail.com",
-      "phone": "987654321",
-      "deliveryLocation": "knom",
+      "phone": "9876543210",
+      "deliveryLocation": "Pune",
       "selectedDates": [
         "2026-09-19"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 700,
       "refundableDeposit": 2000,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T08:58:28.145Z"
+      "time": "19 Sep 2026, 02:28 PM"
     },
     {
       "id": "GB-937033",
       "outfitId": "gfit-01",
-      "outfitName": "Royal Mirrorwork Peacock Chaniya Choli",
-      "customerName": "Krishnaa Gordeee",
+      "outfitName": "Cherry Red Chaniya",
+      "customerName": "Krishna Gorde",
       "email": "vrutimoradiya6002@gmail.com",
       "phone": "8780765469",
-      "deliveryLocation": "loni",
+      "deliveryLocation": "Loni",
       "selectedDates": [
         "2026-09-22"
       ],
-      "rentalNights": 1,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 700,
       "refundableDeposit": 2000,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T08:52:17.033Z"
+      "time": "19 Sep 2026, 02:22 PM"
     },
     {
       "id": "GB-054264",
       "outfitId": "gfit-02",
-      "outfitName": "Sunkissed Marigold Rabari Ensemble",
+      "outfitName": "Ivory Maroon Striped Chaniya",
       "customerName": "Vruti Moradiya",
       "email": "vrutimoradiya999@gmail.com",
       "phone": "6354793852",
@@ -245,13 +269,10 @@
         "2026-10-14",
         "2026-10-15"
       ],
-      "rentalNights": 2,
-      "size": "M",
       "paymentMethod": "trial",
       "totalRent": 1400,
       "refundableDeposit": 2500,
-      "status": "Confirmed",
-      "createdAt": "2026-09-19T08:37:34.264Z"
+      "time": "19 Sep 2026, 02:07 PM"
     }
   ],
   "inquiries": [],

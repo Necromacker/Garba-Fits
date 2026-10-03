@@ -13,7 +13,10 @@ function createTransporter() {
 
   if (emailUser && emailPass) {
     return nodemailer.createTransport({
-      service: process.env.EMAIL_SERVICE || 'gmail',
+      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+      port: Number(process.env.EMAIL_PORT) || 587,
+      secure: process.env.EMAIL_SECURE === 'true', // false for 587 (STARTTLS)
+      family: 4, // Force IPv4 to prevent ENETUNREACH errors on cloud hosts like Render
       auth: {
         user: emailUser,
         pass: emailPass

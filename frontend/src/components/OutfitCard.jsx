@@ -10,6 +10,7 @@ export default function OutfitCard({ outfit, onRentClick }) {
     setCurrentIdx((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
+
   const handleNext = (e) => {
     e.stopPropagation();
     setCurrentIdx((prev) => (prev === images.length - 1 ? 0 : prev + 1));
