@@ -6,39 +6,58 @@ dotenv.config();
 // Admin notification recipients
 const ADMIN_EMAILS = process.env.ADMIN_EMAILS || 'vrutimoradiya999@gmail.com, krishnagorde04@gmail.com';
 
-// Configure transporter
+console.log(`\n------------------------------------------------------`);
+console.log(`[Email Config Check]`);
+console.log(`- EMAIL_USER: ${process.env.EMAIL_USER || '(NOT SET)'}`);
+console.log(`- EMAIL_PASS: ${process.env.EMAIL_PASS ? `SET (${process.env.EMAIL_PASS.replace(/\s+/g, '').length} chars)` : '(NOT SET)'}`);
+console.log(`- EMAIL_SERVICE: ${process.env.EMAIL_SERVICE || 'gmail (default)'}`);
+console.log(`- ADMIN_EMAILS: ${ADMIN_EMAILS}`);
+console.log(`------------------------------------------------------\n`);
+
+// Configure transporter with timeouts and Gmail configuration
 function createTransporter() {
   const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
+  const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : null;
 
   if (emailUser && emailPass) {
-    // If Gmail service or Gmail address, use nodemailer's built-in Gmail service configuration
-    if (process.env.EMAIL_SERVICE === 'gmail' || emailUser.includes('@gmail.com')) {
-      return nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: emailUser,
-          pass: emailPass
-        }
-      });
-    }
-
+    console.log(`[Email Transporter] Initializing Gmail transporter for ${emailUser}...`);
+    
     return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-      port: Number(process.env.EMAIL_PORT) || 465,
-      secure: process.env.EMAIL_SECURE !== 'false', // true for 465 (SSL)
+      service: 'gmail',
       auth: {
         user: emailUser,
         pass: emailPass
+      },
+      connectionTimeout: 15000, // 15 seconds connection timeout (prevents 2-min hanging)
+      greetingTimeout: 10000,   // 10 seconds greeting timeout
+      socketTimeout: 15000,     // 15 seconds socket timeout
+      tls: {
+        rejectUnauthorized: false // avoids SSL handshake rejection on some cloud proxies
       }
     });
   }
 
-  // Fallback logger transporter for development/testing without credentials
+  console.warn(`[Email Transporter Warning] EMAIL_USER or EMAIL_PASS not set. Real emails will NOT be sent.`);
   return null;
 }
 
 const transporter = createTransporter();
+
+// Verify connection on startup to print immediate diagnostics in logs
+if (transporter) {
+  console.log(`[Email Verification] Testing SMTP connection to Gmail...`);
+  transporter.verify((error, success) => {
+    if (error) {
+      console.error(`\n[Email Verification ✗ FAILED]`);
+      console.error(`- Error Code: ${error.code || 'UNKNOWN'}`);
+      console.error(`- Error Message: ${error.message}`);
+      console.error(`- Command: ${error.command || 'N/A'}`);
+      console.error(`(Tip: If code is ETIMEDOUT, Render may be blocking outgoing SMTP. If EAUTH, check Gmail App Password.)\n`);
+    } else {
+      console.log(`\n[Email Verification ✓ SUCCESS] Connected to Gmail SMTP successfully! Ready to dispatch emails.\n`);
+    }
+  });
+}
 
 /**
  * Send Simple Acknowledgment Email to Customer
@@ -47,8 +66,15 @@ export async function sendCustomerAcknowledgment(booking) {
   const customerEmail = booking.email;
   const customerName = booking.customerName || 'Garba Enthusiast';
 
+  console.log(`\n------------------------------------------------------`);
+  console.log(`[STEP 1 - Customer Email] Starting acknowledgment dispatch`);
+  console.log(`- Recipient: ${customerEmail}`);
+  console.log(`- Customer: ${customerName}`);
+  console.log(`- Booking ID: ${booking.id}`);
+
   if (!customerEmail || !customerEmail.includes('@')) {
-    console.log(`[Email] No valid email provided for customer: ${customerName}`);
+    console.log(`[STEP 1 - Skipped] No valid email provided for customer: ${customerName}`);
+    console.log(`------------------------------------------------------\n`);
     return;
   }
 
@@ -91,24 +117,26 @@ export async function sendCustomerAcknowledgment(booking) {
 
   if (transporter) {
     try {
-      await transporter.sendMail({
+      console.log(`[STEP 2 - Customer Email] Calling transporter.sendMail()...`);
+      const info = await transporter.sendMail({
         from: `"GarbaFits" <${process.env.EMAIL_USER}>`,
         to: customerEmail,
         subject,
         html: htmlContent
       });
-      console.log(`[Email] ✓ Customer acknowledgment email sent to: ${customerEmail}`);
+      console.log(`[STEP 2 - Result ✓] Customer acknowledgment sent successfully!`);
+      console.log(`- MessageId: ${info.messageId}`);
+      console.log(`- Response: ${info.response}`);
     } catch (err) {
-      console.error(`[Email Error] Failed to send email to customer ${customerEmail}:`, err.message);
+      console.error(`\n[STEP 2 - Error ✗] Failed to send email to customer ${customerEmail}:`);
+      console.error(`- Code: ${err.code || 'UNKNOWN'}`);
+      console.error(`- Message: ${err.message}`);
+      if (err.command) console.error(`- Failed Command: ${err.command}`);
     }
   } else {
-    console.log(`\n======================================================`);
-    console.log(`[EMAIL DISPATCH - TO CUSTOMER: ${customerEmail}]`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Message: Hi ${customerName}, your request has been noted! We will get back to you soon.`);
-    console.log(`(Configure EMAIL_USER and EMAIL_PASS in backend/.env to send real emails via Gmail/SMTP)`);
-    console.log(`======================================================\n`);
+    console.log(`[STEP 2 - Fallback Log] Transporter not initialized. Missing credentials.`);
   }
+  console.log(`------------------------------------------------------\n`);
 }
 
 /**
@@ -117,6 +145,11 @@ export async function sendCustomerAcknowledgment(booking) {
 export async function sendAdminNotification(booking) {
   const subject = `⚡ New Free Trial / Booking Request: ${booking.customerName} (${booking.id})`;
   const datesText = Array.isArray(booking.selectedDates) ? booking.selectedDates.join(', ') : (booking.selectedDates || 'Not specified');
+
+  console.log(`\n------------------------------------------------------`);
+  console.log(`[STEP 3 - Admin Email] Starting admin notification dispatch`);
+  console.log(`- Recipient(s): ${ADMIN_EMAILS}`);
+  console.log(`- Booking ID: ${booking.id}`);
 
   const htmlContent = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
@@ -163,7 +196,7 @@ export async function sendAdminNotification(booking) {
         </table>
 
         <div style="margin-top: 24px; text-align: center;">
-          <a href="https://wa.me/91${booking.phone.replace(/\\D/g, '')}?text=Hi%20${encodeURIComponent(booking.customerName)},%20this%20is%20from%20GarbaFits!%20We%20received%20your%20trial%20request." style="display: inline-block; background-color: #25D366; color: #ffffff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px;">
+          <a href="https://wa.me/91${booking.phone.replace(/\D/g, '')}?text=Hi%20${encodeURIComponent(booking.customerName)},%20this%20is%20from%20GarbaFits!%20We%20received%20your%20trial%20request." style="display: inline-block; background-color: #25D366; color: #ffffff; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px;">
             Open in WhatsApp to Reply
           </a>
         </div>
@@ -173,22 +206,24 @@ export async function sendAdminNotification(booking) {
 
   if (transporter) {
     try {
-      await transporter.sendMail({
+      console.log(`[STEP 4 - Admin Email] Calling transporter.sendMail()...`);
+      const info = await transporter.sendMail({
         from: `"GarbaFits Alert" <${process.env.EMAIL_USER}>`,
         to: ADMIN_EMAILS,
         subject,
         html: htmlContent
       });
-      console.log(`[Email] ✓ Admin notification dispatched to: ${ADMIN_EMAILS}`);
+      console.log(`[STEP 4 - Result ✓] Admin notification sent successfully!`);
+      console.log(`- MessageId: ${info.messageId}`);
+      console.log(`- Response: ${info.response}`);
     } catch (err) {
-      console.error(`[Email Error] Failed to send admin notification:`, err.message);
+      console.error(`\n[STEP 4 - Error ✗] Failed to send admin notification:`);
+      console.error(`- Code: ${err.code || 'UNKNOWN'}`);
+      console.error(`- Message: ${err.message}`);
+      if (err.command) console.error(`- Failed Command: ${err.command}`);
     }
   } else {
-    console.log(`\n======================================================`);
-    console.log(`[ADMIN NOTIFICATION DISPATCHED TO: ${ADMIN_EMAILS}]`);
-    console.log(`Subject: ${subject}`);
-    console.log(`Customer: ${booking.customerName} | Phone: ${booking.phone} | Email: ${booking.email}`);
-    console.log(`Outfit: ${booking.outfitName} | Dates: ${datesText} | Location: ${booking.deliveryLocation}`);
-    console.log(`======================================================\n`);
+    console.log(`[STEP 4 - Fallback Log] Transporter not initialized.`);
   }
+  console.log(`------------------------------------------------------\n`);
 }
