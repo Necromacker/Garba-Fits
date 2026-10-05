@@ -12,11 +12,21 @@ function createTransporter() {
   const emailPass = process.env.EMAIL_PASS;
 
   if (emailUser && emailPass) {
+    // If Gmail service or Gmail address, use nodemailer's built-in Gmail service configuration
+    if (process.env.EMAIL_SERVICE === 'gmail' || emailUser.includes('@gmail.com')) {
+      return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: emailUser,
+          pass: emailPass
+        }
+      });
+    }
+
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-      port: Number(process.env.EMAIL_PORT) || 587,
-      secure: process.env.EMAIL_SECURE === 'true', // false for 587 (STARTTLS)
-      family: 4, // Force IPv4 to prevent ENETUNREACH errors on cloud hosts like Render
+      port: Number(process.env.EMAIL_PORT) || 465,
+      secure: process.env.EMAIL_SECURE !== 'false', // true for 465 (SSL)
       auth: {
         user: emailUser,
         pass: emailPass
