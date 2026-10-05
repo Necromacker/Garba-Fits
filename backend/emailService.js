@@ -6,10 +6,10 @@ dotenv.config();
 // Admin notification recipients
 const ADMIN_EMAILS = process.env.ADMIN_EMAILS || 'vrutimoradiya999@gmail.com, krishnagorde04@gmail.com';
 
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
-const EMAIL_USER = process.env.EMAIL_USER || 'vrutimoradiya999@gmail.com';
+const GOOGLE_CLIENT_ID = (process.env.GOOGLE_CLIENT_ID || '').trim();
+const GOOGLE_CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET || '').trim();
+const GOOGLE_REFRESH_TOKEN = (process.env.GOOGLE_REFRESH_TOKEN || '').trim();
+const EMAIL_USER = (process.env.EMAIL_USER || 'vrutimoradiya999@gmail.com').trim();
 
 console.log(`\n------------------------------------------------------`);
 console.log(`[Email Config Check]`);
