@@ -267,7 +267,8 @@ app.post('/api/rentals', async (req, res) => {
   }
 
   const formatReadableTime = (d = new Date()) => {
-    return new Date(d).toLocaleString('en-US', {
+    return new Date(d).toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata',
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -331,7 +332,7 @@ app.post('/api/contact', (req, res) => {
     city: city || 'Ahmedabad',
     message: message || 'Studio trial visit request',
     preferredDate: preferredDate || new Date().toISOString().split('T')[0],
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
   };
 
   db.saveInquiry(inquiry);

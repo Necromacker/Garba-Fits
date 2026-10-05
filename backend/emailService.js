@@ -11,17 +11,6 @@ const GOOGLE_CLIENT_SECRET = (process.env.GOOGLE_CLIENT_SECRET || '').trim();
 const GOOGLE_REFRESH_TOKEN = (process.env.GOOGLE_REFRESH_TOKEN || '').trim();
 const EMAIL_USER = (process.env.EMAIL_USER || 'vrutimoradiya999@gmail.com').trim();
 
-console.log(`\n------------------------------------------------------`);
-console.log(`[Email Config Check]`);
-console.log(`- EMAIL_USER: ${EMAIL_USER}`);
-console.log(`- GMAIL REST API (OAuth2 Port 443): ${GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_REFRESH_TOKEN ? 'ACTIVE (Port 443 HTTPS ✓)' : 'INCOMPLETE'}`);
-console.log(`  * GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID ? 'SET' : '(NOT SET)'}`);
-console.log(`  * GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET ? 'SET' : '(NOT SET)'}`);
-console.log(`  * GOOGLE_REFRESH_TOKEN: ${GOOGLE_REFRESH_TOKEN ? 'SET' : '(NOT SET)'}`);
-console.log(`- EMAIL_PASS (SMTP fallback): ${process.env.EMAIL_PASS ? `SET (${process.env.EMAIL_PASS.replace(/\s+/g, '').length} chars)` : '(NOT SET)'}`);
-console.log(`- ADMIN_EMAILS: ${ADMIN_EMAILS}`);
-console.log(`------------------------------------------------------\n`);
-
 /**
  * Exchange Refresh Token for a fresh Access Token using Google OAuth2 over HTTPS (Port 443)
  */
@@ -118,24 +107,18 @@ const transporter = createTransporter();
 /**
  * Unified dispatch function (Prioritizes Gmail REST API over Port 443)
  */
-async function dispatchEmail({ to, subject, html, logLabel }) {
+async function dispatchEmail({ to, subject, html }) {
   if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_REFRESH_TOKEN) {
-    console.log(`[${logLabel}] Sending via Gmail REST API (Port 443 HTTPS)...`);
-    const result = await sendViaGmailAPI(to, subject, html);
-    console.log(`[${logLabel} Result ✓] Delivered via Gmail API! Message ID: ${result.id}`);
-    return result;
+    return await sendViaGmailAPI(to, subject, html);
   }
 
   if (transporter) {
-    console.log(`[${logLabel}] Sending via Gmail SMTP fallback...`);
-    const result = await transporter.sendMail({
+    return await transporter.sendMail({
       from: `"GarbaFits" <${EMAIL_USER}>`,
       to,
       subject,
       html
     });
-    console.log(`[${logLabel} Result ✓] Delivered via SMTP MessageId: ${result.messageId}`);
-    return result;
   }
 
   throw new Error('No email credentials configured. Please set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN in Render environment.');
@@ -148,15 +131,7 @@ export async function sendCustomerAcknowledgment(booking) {
   const customerEmail = booking.email;
   const customerName = booking.customerName || 'Garba Enthusiast';
 
-  console.log(`\n------------------------------------------------------`);
-  console.log(`[STEP 1 - Customer Email] Starting acknowledgment dispatch`);
-  console.log(`- Recipient: ${customerEmail}`);
-  console.log(`- Customer: ${customerName}`);
-  console.log(`- Booking ID: ${booking.id}`);
-
   if (!customerEmail || !customerEmail.includes('@')) {
-    console.log(`[STEP 1 - Skipped] No valid email provided for customer: ${customerName}`);
-    console.log(`------------------------------------------------------\n`);
     return;
   }
 
@@ -198,19 +173,15 @@ export async function sendCustomerAcknowledgment(booking) {
   `;
 
   try {
-    console.log(`[STEP 2 - Customer Email] Calling dispatchEmail()...`);
     await dispatchEmail({
       to: customerEmail,
       subject,
-      html: htmlContent,
-      logLabel: 'STEP 2 - Customer Email'
+      html: htmlContent
     });
-    console.log(`[STEP 2 - Result ✓] Customer acknowledgment sent successfully!`);
+    console.log(`Customer acknowledgment sent successfully!`);
   } catch (err) {
-    console.error(`\n[STEP 2 - Error ✗] Failed to send email to customer ${customerEmail}:`);
-    console.error(`- Message: ${err.message}`);
+    console.error(`[Email Error] Customer acknowledgment failed:`, err.message);
   }
-  console.log(`------------------------------------------------------\n`);
 }
 
 /**
@@ -219,11 +190,6 @@ export async function sendCustomerAcknowledgment(booking) {
 export async function sendAdminNotification(booking) {
   const subject = `⚡ New Free Trial / Booking Request: ${booking.customerName} (${booking.id})`;
   const datesText = Array.isArray(booking.selectedDates) ? booking.selectedDates.join(', ') : (booking.selectedDates || 'Not specified');
-
-  console.log(`\n------------------------------------------------------`);
-  console.log(`[STEP 3 - Admin Email] Starting admin notification dispatch`);
-  console.log(`- Recipient(s): ${ADMIN_EMAILS}`);
-  console.log(`- Booking ID: ${booking.id}`);
 
   const htmlContent = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden;">
@@ -279,17 +245,13 @@ export async function sendAdminNotification(booking) {
   `;
 
   try {
-    console.log(`[STEP 4 - Admin Email] Calling dispatchEmail()...`);
     await dispatchEmail({
       to: ADMIN_EMAILS,
       subject,
-      html: htmlContent,
-      logLabel: 'STEP 4 - Admin Email'
+      html: htmlContent
     });
-    console.log(`[STEP 4 - Result ✓] Admin notification sent successfully!`);
+    console.log(`Admin notification sent successfully!`);
   } catch (err) {
-    console.error(`\n[STEP 4 - Error ✗] Failed to send admin notification:`);
-    console.error(`- Message: ${err.message}`);
+    console.error(`[Email Error] Admin notification failed:`, err.message);
   }
-  console.log(`------------------------------------------------------\n`);
 }

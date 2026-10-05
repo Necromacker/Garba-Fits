@@ -1,6 +1,38 @@
 {
   "bookings": [
     {
+      "id": "GB-614587",
+      "outfitId": "gfit-02",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "4 4",
+      "email": "krishnagorde04@gmail.com",
+      "phone": "9404527706",
+      "deliveryLocation": "12",
+      "selectedDates": [
+        "2026-10-06"
+      ],
+      "paymentMethod": "cod",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "time": "Oct 05, 2026, 10:36 PM"
+    },
+    {
+      "id": "GB-994758",
+      "outfitId": "gfit-02",
+      "outfitName": "Ivory Maroon Striped Chaniya",
+      "customerName": "aa aa",
+      "email": "krishnagorde04@gmail.com",
+      "phone": "9404527706",
+      "deliveryLocation": "21212ff",
+      "selectedDates": [
+        "2026-10-07"
+      ],
+      "paymentMethod": "cod",
+      "totalRent": 900,
+      "refundableDeposit": 900,
+      "time": "Oct 05, 2026, 10:14 PM"
+    },
+    {
       "id": "GB-268890",
       "outfitId": "gfit-02",
       "outfitName": "Ivory Maroon Striped Chaniya",
