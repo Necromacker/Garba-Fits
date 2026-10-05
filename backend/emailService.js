@@ -6,57 +6,139 @@ dotenv.config();
 // Admin notification recipients
 const ADMIN_EMAILS = process.env.ADMIN_EMAILS || 'vrutimoradiya999@gmail.com, krishnagorde04@gmail.com';
 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
+const EMAIL_USER = process.env.EMAIL_USER || 'vrutimoradiya999@gmail.com';
+
 console.log(`\n------------------------------------------------------`);
 console.log(`[Email Config Check]`);
-console.log(`- EMAIL_USER: ${process.env.EMAIL_USER || '(NOT SET)'}`);
-console.log(`- EMAIL_PASS: ${process.env.EMAIL_PASS ? `SET (${process.env.EMAIL_PASS.replace(/\s+/g, '').length} chars)` : '(NOT SET)'}`);
-console.log(`- EMAIL_SERVICE: ${process.env.EMAIL_SERVICE || 'gmail (default)'}`);
+console.log(`- EMAIL_USER: ${EMAIL_USER}`);
+console.log(`- GMAIL REST API (OAuth2 Port 443): ${GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_REFRESH_TOKEN ? 'ACTIVE (Port 443 HTTPS ✓)' : 'INCOMPLETE'}`);
+console.log(`  * GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID ? 'SET' : '(NOT SET)'}`);
+console.log(`  * GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET ? 'SET' : '(NOT SET)'}`);
+console.log(`  * GOOGLE_REFRESH_TOKEN: ${GOOGLE_REFRESH_TOKEN ? 'SET' : '(NOT SET)'}`);
+console.log(`- EMAIL_PASS (SMTP fallback): ${process.env.EMAIL_PASS ? `SET (${process.env.EMAIL_PASS.replace(/\s+/g, '').length} chars)` : '(NOT SET)'}`);
 console.log(`- ADMIN_EMAILS: ${ADMIN_EMAILS}`);
 console.log(`------------------------------------------------------\n`);
 
-// Configure transporter with timeouts and Gmail configuration
-function createTransporter() {
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : null;
+/**
+ * Exchange Refresh Token for a fresh Access Token using Google OAuth2 over HTTPS (Port 443)
+ */
+async function getGoogleAccessToken() {
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    client_secret: GOOGLE_CLIENT_SECRET,
+    refresh_token: GOOGLE_REFRESH_TOKEN,
+    grant_type: 'refresh_token'
+  });
 
-  if (emailUser && emailPass) {
-    console.log(`[Email Transporter] Initializing Gmail transporter for ${emailUser}...`);
-    
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(`Google OAuth token exchange failed: ${data.error_description || data.error || JSON.stringify(data)}`);
+  }
+  return data.access_token;
+}
+
+/**
+ * Format RFC 2822 email and Base64URL encode for Gmail REST API
+ */
+function createRawEmail({ from, to, subject, html }) {
+  const toHeader = Array.isArray(to) ? to.join(', ') : to;
+  const messageParts = [
+    `From: ${from}`,
+    `To: ${toHeader}`,
+    `Subject: =?utf-8?B?${Buffer.from(subject).toString('base64')}?=`,
+    'MIME-Version: 1.0',
+    'Content-Type: text/html; charset=utf-8',
+    'Content-Transfer-Encoding: base64',
+    '',
+    Buffer.from(html).toString('base64')
+  ];
+
+  const rawMessage = messageParts.join('\r\n');
+  return Buffer.from(rawMessage)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+}
+
+/**
+ * Send email via Gmail REST API (Pure HTTPS Port 443 - Bypasses all Render SMTP blocks)
+ */
+async function sendViaGmailAPI(to, subject, html) {
+  const accessToken = await getGoogleAccessToken();
+  const raw = createRawEmail({
+    from: `GarbaFits <${EMAIL_USER}>`,
+    to,
+    subject,
+    html
+  });
+
+  const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ raw })
+  });
+
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(`Gmail API send failed: ${data.error?.message || JSON.stringify(data)}`);
+  }
+  return data;
+}
+
+// Nodemailer SMTP fallback for local development
+function createTransporter() {
+  const emailPass = process.env.EMAIL_PASS ? process.env.EMAIL_PASS.replace(/\s+/g, '') : null;
+  if (EMAIL_USER && emailPass) {
     return nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: emailUser,
+        user: EMAIL_USER,
         pass: emailPass
-      },
-      connectionTimeout: 15000, // 15 seconds connection timeout (prevents 2-min hanging)
-      greetingTimeout: 10000,   // 10 seconds greeting timeout
-      socketTimeout: 15000,     // 15 seconds socket timeout
-      tls: {
-        rejectUnauthorized: false // avoids SSL handshake rejection on some cloud proxies
       }
     });
   }
-
-  console.warn(`[Email Transporter Warning] EMAIL_USER or EMAIL_PASS not set. Real emails will NOT be sent.`);
   return null;
 }
 
 const transporter = createTransporter();
 
-// Verify connection on startup to print immediate diagnostics in logs
-if (transporter) {
-  console.log(`[Email Verification] Testing SMTP connection to Gmail...`);
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error(`\n[Email Verification ✗ FAILED]`);
-      console.error(`- Error Code: ${error.code || 'UNKNOWN'}`);
-      console.error(`- Error Message: ${error.message}`);
-      console.error(`- Command: ${error.command || 'N/A'}`);
-      console.error(`(Tip: If code is ETIMEDOUT, Render may be blocking outgoing SMTP. If EAUTH, check Gmail App Password.)\n`);
-    } else {
-      console.log(`\n[Email Verification ✓ SUCCESS] Connected to Gmail SMTP successfully! Ready to dispatch emails.\n`);
-    }
-  });
+/**
+ * Unified dispatch function (Prioritizes Gmail REST API over Port 443)
+ */
+async function dispatchEmail({ to, subject, html, logLabel }) {
+  if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_REFRESH_TOKEN) {
+    console.log(`[${logLabel}] Sending via Gmail REST API (Port 443 HTTPS)...`);
+    const result = await sendViaGmailAPI(to, subject, html);
+    console.log(`[${logLabel} Result ✓] Delivered via Gmail API! Message ID: ${result.id}`);
+    return result;
+  }
+
+  if (transporter) {
+    console.log(`[${logLabel}] Sending via Gmail SMTP fallback...`);
+    const result = await transporter.sendMail({
+      from: `"GarbaFits" <${EMAIL_USER}>`,
+      to,
+      subject,
+      html
+    });
+    console.log(`[${logLabel} Result ✓] Delivered via SMTP MessageId: ${result.messageId}`);
+    return result;
+  }
+
+  throw new Error('No email credentials configured. Please set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REFRESH_TOKEN in Render environment.');
 }
 
 /**
@@ -115,26 +197,18 @@ export async function sendCustomerAcknowledgment(booking) {
     </div>
   `;
 
-  if (transporter) {
-    try {
-      console.log(`[STEP 2 - Customer Email] Calling transporter.sendMail()...`);
-      const info = await transporter.sendMail({
-        from: `"GarbaFits" <${process.env.EMAIL_USER}>`,
-        to: customerEmail,
-        subject,
-        html: htmlContent
-      });
-      console.log(`[STEP 2 - Result ✓] Customer acknowledgment sent successfully!`);
-      console.log(`- MessageId: ${info.messageId}`);
-      console.log(`- Response: ${info.response}`);
-    } catch (err) {
-      console.error(`\n[STEP 2 - Error ✗] Failed to send email to customer ${customerEmail}:`);
-      console.error(`- Code: ${err.code || 'UNKNOWN'}`);
-      console.error(`- Message: ${err.message}`);
-      if (err.command) console.error(`- Failed Command: ${err.command}`);
-    }
-  } else {
-    console.log(`[STEP 2 - Fallback Log] Transporter not initialized. Missing credentials.`);
+  try {
+    console.log(`[STEP 2 - Customer Email] Calling dispatchEmail()...`);
+    await dispatchEmail({
+      to: customerEmail,
+      subject,
+      html: htmlContent,
+      logLabel: 'STEP 2 - Customer Email'
+    });
+    console.log(`[STEP 2 - Result ✓] Customer acknowledgment sent successfully!`);
+  } catch (err) {
+    console.error(`\n[STEP 2 - Error ✗] Failed to send email to customer ${customerEmail}:`);
+    console.error(`- Message: ${err.message}`);
   }
   console.log(`------------------------------------------------------\n`);
 }
@@ -204,26 +278,18 @@ export async function sendAdminNotification(booking) {
     </div>
   `;
 
-  if (transporter) {
-    try {
-      console.log(`[STEP 4 - Admin Email] Calling transporter.sendMail()...`);
-      const info = await transporter.sendMail({
-        from: `"GarbaFits Alert" <${process.env.EMAIL_USER}>`,
-        to: ADMIN_EMAILS,
-        subject,
-        html: htmlContent
-      });
-      console.log(`[STEP 4 - Result ✓] Admin notification sent successfully!`);
-      console.log(`- MessageId: ${info.messageId}`);
-      console.log(`- Response: ${info.response}`);
-    } catch (err) {
-      console.error(`\n[STEP 4 - Error ✗] Failed to send admin notification:`);
-      console.error(`- Code: ${err.code || 'UNKNOWN'}`);
-      console.error(`- Message: ${err.message}`);
-      if (err.command) console.error(`- Failed Command: ${err.command}`);
-    }
-  } else {
-    console.log(`[STEP 4 - Fallback Log] Transporter not initialized.`);
+  try {
+    console.log(`[STEP 4 - Admin Email] Calling dispatchEmail()...`);
+    await dispatchEmail({
+      to: ADMIN_EMAILS,
+      subject,
+      html: htmlContent,
+      logLabel: 'STEP 4 - Admin Email'
+    });
+    console.log(`[STEP 4 - Result ✓] Admin notification sent successfully!`);
+  } catch (err) {
+    console.error(`\n[STEP 4 - Error ✗] Failed to send admin notification:`);
+    console.error(`- Message: ${err.message}`);
   }
   console.log(`------------------------------------------------------\n`);
 }
