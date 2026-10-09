@@ -21,6 +21,9 @@ const getOutfitImages = (outfit) => {
   if (outfit.images && outfit.images.length > 0) return outfit.images;
   if (outfit.image) return [outfit.image];
   const num = parseInt(outfit.id?.replace(/\D/g, '') || '1', 10);
+  if (num === 15) {
+    return ['/assets/outfits/p15a.webp', '/assets/outfits/p15b.webp'];
+  }
   return num <= 14
     ? [`/assets/outfits/p${num}a.webp`, `/assets/outfits/p${num}b.webp`]
     : [`/assets/outfits/p${num}a.webp`];
@@ -82,8 +85,8 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent }, ref) => {
               <img
                 src={imgSrc}
                 alt={`${outfit.name} - view ${idx + 1}`}
-                className={parseInt(outfit.id?.replace(/\D/g, '') || '1', 10) >= 23 ? "img-cover-fit" : ""}
-                style={parseInt(outfit.id?.replace(/\D/g, '') || '1', 10) >= 23 ? { objectFit: 'cover', objectPosition: 'center top' } : {}}
+                className={parseInt(outfit.id?.replace(/\D/g, '') || '1', 10) >= 30 ? "img-cover-fit" : ""}
+                style={parseInt(outfit.id?.replace(/\D/g, '') || '1', 10) >= 30 ? { objectFit: 'cover', objectPosition: 'center top' } : {}}
                 loading={idx === 0 ? "eager" : "lazy"}
                 decoding="async"
                 onError={(e) => {
@@ -104,7 +107,7 @@ const OutfitCardItem = React.forwardRef(({ outfit, onRent }, ref) => {
         </span>
 
         {/* Free Jewellery tag - top right */}
-        {Number(outfit.price ?? outfit.pricePerNight) === 900 && (
+        {Number(outfit.price ?? outfit.pricePerNight) === 800 && (
           <span className="card-jewellery-tag">
             Free Jewellery
           </span>
@@ -797,7 +800,7 @@ export default function Home({
             <div className="preview-modal-images-top">
               {getOutfitImages(viewModalOutfit).map((imgSrc, idx) => {
                 const vNum = parseInt(viewModalOutfit.id?.replace(/\D/g, '') || '1', 10);
-                const isVCover = vNum >= 23 && vNum <= 41;
+                const isVCover = vNum >= 30 && vNum <= 48;
                 return (
                   <div key={idx} className="preview-modal-single-img-card">
                     <img

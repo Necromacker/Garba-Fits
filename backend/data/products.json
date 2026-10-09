@@ -85,158 +85,206 @@
   },
   {
     "id": "gfit-15",
-    "name": "Sky Blue Pink Bandhani Dupatta",
-    "price": 100,
-    "deposit": 100
+    "name": "Slate Blue Paisley Tiered Chaniya",
+    "price": 300,
+    "deposit": 1000
   },
   {
     "id": "gfit-16",
-    "name": "Ivory Embroidered Net Dupatta",
-    "price": 100,
-    "deposit": 100
+    "name": "Pearl White Net Lattice Chaniya",
+    "price": 300,
+    "deposit": 1000
   },
   {
     "id": "gfit-17",
-    "name": "Multicolour Kutchi Dupatta",
-    "price": 100,
-    "deposit": 100
+    "name": "Tribal Woven Kutchi Chaniya",
+    "price": 300,
+    "deposit": 1000
   },
   {
     "id": "gfit-18",
-    "name": "Mustard Yellow Bandhani Dupatta",
-    "price": 100,
-    "deposit": 100
+    "name": "Sunlit Amber Bandhani Chaniya",
+    "price": 300,
+    "deposit": 1000
   },
   {
     "id": "gfit-19",
-    "name": "Tricolor Mirror Bandhani Dupatta",
-    "price": 100,
+    "name": "Tricolor Mirror Shell Bandhani Blouse",
+    "price": 250,
     "deposit": 100
   },
   {
     "id": "gfit-20",
-    "name": "Multicolour Gota Striped Dupatta",
+    "name": "Rainbow Zari Foliage Dupatta",
     "price": 100,
     "deposit": 100
   },
   {
     "id": "gfit-21",
-    "name": "Bright Yellow Leheriya Dupatta",
+    "name": "Lemon Sunshine Leheriya Dupatta",
     "price": 100,
     "deposit": 100
   },
   {
     "id": "gfit-22",
-    "name": "Rani Pink Organza Dupatta",
+    "name": "Sky Blue Pink Bandhani Dupatta",
     "price": 100,
     "deposit": 100
   },
   {
     "id": "gfit-23",
+    "name": "Ivory Embroidered Net Dupatta",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-24",
+    "name": "Multicolour Kutchi Dupatta",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-25",
+    "name": "Mustard Yellow Bandhani Dupatta",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-26",
+    "name": "Tricolor Mirror Bandhani Dupatta",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-27",
+    "name": "Multicolour Gota Striped Dupatta",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-28",
+    "name": "Bright Yellow Leheriya Dupatta",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-29",
+    "name": "Rani Pink Organza Dupatta",
+    "price": 100,
+    "deposit": 100
+  },
+  {
+    "id": "gfit-30",
     "name": "Oxidised Silver Mathapatti",
     "price": 50,
     "deposit": 50
   },
   {
-    "id": "gfit-24",
+    "id": "gfit-31",
     "name": "Crystal Beaded Bun Brooch",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-25",
+    "id": "gfit-32",
     "name": "Oxidised Star Charm Saree Pin",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-26",
+    "id": "gfit-33",
     "name": "Oxidised Black Stone Necklace",
     "price": 60,
     "deposit": 60
   },
   {
-    "id": "gfit-27",
+    "id": "gfit-34",
     "name": "Metallic Silver Bangle Set",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-28",
+    "id": "gfit-35",
     "name": "Floral Oxidised Silver Jhumkas",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-29",
+    "id": "gfit-36",
     "name": "Multicolor Beaded Oxidised Necklace",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-30",
+    "id": "gfit-37",
     "name": "Diamond Studded Oxidised Earrings",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-31",
+    "id": "gfit-38",
     "name": "Mandala Round Oxidised Jhumkas",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-32",
+    "id": "gfit-39",
     "name": "Cone Bell Oxidised Earrings",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-33",
+    "id": "gfit-40",
     "name": "Butterfly Chain Drop Earrings",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-34",
+    "id": "gfit-41",
     "name": "Floral Ring Oxidised Jhumkas",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-35",
+    "id": "gfit-42",
     "name": "Dancing Doll Oxidised Earrings",
     "price": 30,
     "deposit": 50
   },
   {
-    "id": "gfit-36",
+    "id": "gfit-43",
     "name": "Floral Ghungroo Oxidised Kada",
     "price": 60,
     "deposit": 60
   },
   {
-    "id": "gfit-37",
+    "id": "gfit-44",
     "name": "Beaded Jhumka Bangles",
     "price": 60,
     "deposit": 60
   },
   {
-    "id": "gfit-38",
+    "id": "gfit-45",
     "name": "Pearl Chain Dome Jhumkas",
     "price": 60,
     "deposit": 60
   },
   {
-    "id": "gfit-39",
+    "id": "gfit-46",
     "name": "Layered Bell Oxidised Necklace",
     "price": 60,
     "deposit": 60
   },
   {
-    "id": "gfit-40",
+    "id": "gfit-47",
     "name": "Vintage Charm Hanging Brooch",
     "price": 50,
+    "deposit": 50
+  },
+  {
+    "id": "gfit-48",
+    "name": "Geometric Rhombus Drop Jhumkas",
+    "price": 30,
     "deposit": 50
   }
 ]

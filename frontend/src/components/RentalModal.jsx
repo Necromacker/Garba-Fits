@@ -18,6 +18,9 @@ const getOutfitImages = (outfit) => {
   if (outfit.images && outfit.images.length > 0) return outfit.images;
   if (outfit.image) return [outfit.image];
   const num = parseInt(outfit.id?.replace(/\D/g, '') || '1', 10);
+  if (num === 15) {
+    return ['/assets/outfits/p15a.webp', '/assets/outfits/p15b.webp'];
+  }
   return num <= 14
     ? [`/assets/outfits/p${num}a.webp`, `/assets/outfits/p${num}b.webp`]
     : [`/assets/outfits/p${num}a.webp`];
